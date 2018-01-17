@@ -1,0 +1,16 @@
+cd ARPACK
+LocalDir="$(pwd)";
+sed -i -e "s|MyDir|$LocalDir|" ARmake.inc
+echo "************************"
+echo "****Compiling ARPACK****"
+echo "************************"
+make clean
+make all
+cd ../source
+echo "***********************"
+echo "****Compiling DVCI****"
+echo "***********************"
+make clean
+make all
+cd ..
+echo "alias DVCI='$(pwd)/source/./DVCI'" >> ~/.bashrc

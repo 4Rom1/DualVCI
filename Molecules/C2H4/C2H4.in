@@ -1,0 +1,26 @@
+NMode 12                 /  Number of normal coordinates
+PESType 1                /  PES type of coefficients
+OutName C2H4_F           /  Extension name for output files.
+PESName C2H4_PES.in      /  Name of the file of the PES.
+Memory 700
+DoRot 1 
+EtaComp 2
+NAdd 100
+MaxEv 90 
+ThrCoor 0.4
+RefName C2H4_Ref.txt
+TargetState Fund
+MaxAdd 10000            /Limit number of basis function to add at each iteration
+Verbose 1
+KNRez 0.14
+KNNZ 0.015
+KNZREZ 0.13
+ThrKX 1
+EpsRez 0.0065
+Freq0Max 30000
+AddTarget 1
+Freq0Max 30000
+MAXNCV 130
+DeltaNEV 15
+AddTarget 1
+

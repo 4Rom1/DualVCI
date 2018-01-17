@@ -1,0 +1,303 @@
+*********************
+
+    Dual Vibration Configuration Interaction (DVCI).
+    A novel factorisation of molecular Hamiltonian for
+    high performance infrared spectrum computation, 
+    Romain Garnier <rom1{dot}garnier{at}yahoo{dot}fr>,
+    submitted in 2017.
+
+    List of inputs for molecules : N2H2,CH3CN,C2H4,C2H4O,C3H3NO. 
+ 
+*********************
+
+---------------------
+Input file of N2H2
+----------------------
+NMode 6                / Number of normal coordinates
+PESType 0              / PES type of coefficients
+OutName N2H2           / Extension name for output files.
+PESName N2H2_FF.in     / Name of the file of the PES.
+DoRot 3                / Include rotational terms also for residual matrix 
+EtaComp 1.5            / Basis set selection factor 
+RefName N2H2_Ref1.txt  / Name of reference file 
+NAdd 5                 / Number of added configurations  
+Memory 30              / 60 mega octets of allocated memory
+MaxEv 22               / Max number of eigenvalues 
+PrintOut 1             / print all final basis set and eigenvectors
+Verbose 1              / Print additional comments
+Freq0Max 30000         / Maximal frequency wall above groundstate
+EpsRez 0.009           / Maximal allowed Residue
+ThrKX 1                / Threshold for constants in dual operator
+@@@@@@@@@@@@@@@@@@@@@@@
+---------------------
+Input file of C2H4
+----------------------
+NMode 12                                
+PESType 1              
+OutName C2H4_F           
+PESName C2H4_PES.in    
+Memory 700
+DoRot 1 
+EtaComp 2
+NAdd 100
+MaxEv 90 
+ThrCoor 0.4
+RefName C2H4_Ref.txt
+TargetState Fund
+MaxAdd 10000            /Limit number of basis function to add at each iteration
+Verbose 1
+KNRez 0.14
+KNNZ 0.015
+KNZREZ 0.13
+EpsRez 0.0065
+Freq0Max 30000
+AddTarget 1
+Freq0Max 30000
+MAXNCV 130
+DeltaNEV 15
+/DoGraph 0
+AddTarget 1
+@@@@@@@@@@@@@@@@@@@@@
+---------------------
+Input file of CH3CN
+----------------------
+NMode 12             
+PESType 0                
+OutName CH3CN           
+PESName CH3CN_PES.in     
+MaxEv 400
+DeltaNEV 50
+RefName CH3CN_Ref2.txt
+Verbose 1
+Memory 150
+EpsRez 0.0045
+EtaComp 3
+Nadd 50
+MaxAdd 2000
+KNZREZ 0.22
+KNREZ  0.28
+KNNZ 0.02
+ThrKX 1e-15
+ThrCoor 0.4
+AddTarget 4
+TargetState Fund
+@@@@@@@@@@@@@@@@@@@@@@
+---------------------
+Input file of C2H4O
+First group of targets 
+\nu_{5},\nu_{8},\nu_{4},
+\nu_{11},\nu_{14},\nu_{7},
+\nu_{3},\nu_{10}
+----------------------
+NMode 15                  
+PESType 0                  
+OutName C2H4O_0           
+PESName C2H4O_FF0.dat     
+Memory 1300
+EtaComp 3
+NAdd 100
+MaxEv 12
+ThrCoor 0.4
+ThrKX 1e-15
+GroundState 12461.473
+RefName C2H4O_Ref.txt
+TargetState 0(1)
+TargetState 1(15)
+TargetState 1(12)
+TargetState 1(5)
+TargetState 1(8)
+TargetState 1(11)
+TargetState 1(4)
+TargetState 1(14)
+TargetState 1(7)
+TargetState 1(3)
+TargetState 1(10)
+TargetState 1(2)
+Verbose 1
+EpsRez 0.005
+Freq0Max 30000
+MaxAdd 30000
+KNREZ 0.2
+KNNZ 0.016
+KNZREZ 0.25
+AddTarget 0
+@@@@@@@@@@@@@@@@@@@@@
+---------------------
+Input file of C2H4O
+Second group of target \nu_{9}
+----------------------
+NMode 15                   
+PESType 0                 
+OutName C2H4O_9          
+PESName C2H4O_FF0.dat      
+Memory 1500
+EtaComp 3
+NAdd 100
+MaxEv 150
+ThrCoor 0.4
+ThrKX 1e-15
+GroundState 12461.473
+RefName C2H4O_Ref.txt
+TargetState 1(9)
+Verbose 1
+EpsRez 0.0045
+Freq0Max 30000
+MaxAdd 30000
+KNREZ 0.15
+KNNZ 0.024
+KNZREZ 0.25
+AddTarget 1
+@@@@@@@@@@@@@@@@@@@@@
+---------------------
+Input file of C2H4O
+Third group of target \nu_{1}
+----------------------
+NMode 15                   
+PESType 0                 
+OutName C2H4O_1           
+PESName C2H4O_FF0.dat      
+Memory 1450 
+EtaComp 3
+NAdd 100
+MaxEv 170 
+ThrCoor 0.4
+ThrKX 1e-15
+GroundState 12461.473
+RefName C2H4O_Ref.txt
+TargetState 1(1)
+Verbose 1
+EpsRez 0.0045
+Freq0Max 30000
+MaxAdd 30000
+KNREZ 0.15
+KNNZ 0.024
+KNZREZ 0.25
+AddTarget 2
+@@@@@@@@@@@@@@@@@@@@@
+---------------------
+Input file of C2H4O
+Forth group of target \nu_{6}
+----------------------
+NMode 15                  
+PESType 0                 
+OutName C2H4O_6            
+PESName C2H4O_FF0.dat     
+Memory 1000
+EtaComp 3
+NAdd 300
+MaxEv 183
+ThrCoor 0.4
+ThrKX 1e-15
+GroundState 12461.473
+RefName C2H4O_Ref.txt
+TargetState 1(6)
+Verbose 1
+EpsRez 0.0037
+Freq0Max 30000
+MaxAdd 30000
+KNREZ 0.15
+KNNZ 0.024
+KNZREZ 0.24
+AddTarget 1
+@@@@@@@@@@@@@@@@@@@@@
+---------------------
+Input file of C2H4O
+Fifth group of target \nu_{13}
+----------------------
+NMode 15                 
+PESType 0                  
+OutName C2H4O_3           
+PESName C2H4O_FF0.dat      
+Memory 1400
+EtaComp 3
+NAdd 300
+MaxEv 183
+ThrCoor 0.4
+ThrKX 1e-15
+GroundState 12461.473
+RefName C2H4O_Ref.txt
+TargetState 1(13)
+Verbose 1
+EpsRez 0.0037
+Freq0Max 30000
+MaxAdd 30000
+KNREZ 0.15
+KNNZ 0.024
+KNZREZ 0.24
+AddTarget 1
+@@@@@@@@@@@@@@@@@@@@@
+---------------------
+Input file of C3H3NO
+First group of target \nu_{1} to \nu_{15}
+----------------------
+NMode 18                 
+PESType 0                 
+OutName C3H3ONO           
+PESName C3H3NO_FF.in     
+Memory 6000
+EtaComp 3
+NAdd 100
+DoRot 2
+MaxQLevel 10
+MaxEv 100
+Verbose 1
+TargetState 0(1)
+TargetState 1(1)
+TargetState 1(2)
+TargetState 1(3)
+TargetState 1(4)
+TargetState 1(5)
+TargetState 1(6)
+TargetState 1(7)
+TargetState 1(8)
+TargetState 1(9)
+TargetState 1(10)
+TargetState 1(11)
+TargetState 1(12)
+TargetState 1(13)
+TargetState 1(14)
+TargetState 1(15)
+Kappa 1.5
+/TargetState Fund
+ThrCoor 0.5
+DoGraph 1
+MaxQLevel 10
+EpsRez 0.008
+AddTarget 5
+MaxAdd 30000
+Freq0Max 20000
+KNRez 0.1
+KNNZ 0.05
+KNZREZ 0.17
+DeltaNEV 20
+@@@@@@@@@@@@@@@@@@@@@
+---------------------
+Input file of C3H3NO
+Second group of target \nu_{16} to \nu_{18}
+----------------------
+NMode 18                 
+PESType 0                
+OutName C3H3ONO           
+PESName C3H3NO_FF.in      
+Memory 5300
+EtaComp 2
+NAdd 200
+DoRot 2
+MaxEv 800
+Verbose 1
+GroundState 12559.9032
+TargetState 1(16)
+TargetState 1(17)
+TargetState 1(18)
+ThrCoor 0.3
+Freq0Max 20000
+MaxQLevel 10
+EpsRez 0.01
+AddTarget 6
+MaxAdd 30000
+KNRez 0.12
+KNNZ 0.04
+KNZREZ 0.17
+DeltaNEV 30
+Tol 1e-6
+MAXNCV 1000
