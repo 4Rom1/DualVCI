@@ -30,7 +30,7 @@ Function :
  The resources to be allocated directly depend on the number of nucleus 
  and the number of terms of the potential energy surface that should be provided. 
  The algorithm saves memory and computational time with a new factorization described 
- in the user manual named DVCI_Manual.pdf.
+ in the user manual named "DVCI_Manual.pdf".
  
 ------------------------------------------------------------------------
 
@@ -54,16 +54,16 @@ Installation:
 
  For a second installation on the same or an other machine, you need to go into the sub directory 
  ARPACK, open the file ARmake.inc and be sure that home directory writes "home = MyDir".
- Note that home = MyDir should be already written for the first installation, 
+ Note that "home = MyDir" should be already written for the first installation, 
  and then overwritten by your current directory after you launch the command ./INSTALL. 
 
  If the installation is not running then make the installation file executable by typing 
  $ sudo chmod 777 INSTALL.
 
  During the installation a link between the command DVCI and 
- the executable is created in .bashrc file.
+ the executable is created in ~/.bashrc.
 
- So if you go to your .bashrc you'll see the line 
+ So if you open ~/.bashrc you'll see the line 
  alias DVCI='MyDir/DualVCI/source/./DVCI' 
  where MyDir is the directory you opened DualVCI.zip.
 
@@ -77,7 +77,7 @@ Execution:
  $ MyDir/DualVCI/source/DVCI INPUT.in  
  where INPUT.in contains the different keywords discussed in the user manual (DVCI_Manual.pdf).
  If DVCI command is not recognized on your terminal, 
- then the bashrc file need to be sourced with command 
+ then the bashrc file needs to be sourced with command 
  $ source ~/.bashrc
 
  The directory where is executed DVCI should also contain the potential energy file
@@ -107,7 +107,7 @@ Test cases:
 
  For C3H3NO, potential energy surface is generated with methods described in 
  [2] Sparta et al. JCTC, 6(10):3162-3175, 2010, 
- [3] Sparta et al. (J. Phys. Chem. A (2009), 113, 8712-8723), 
+ [3] Sparta et al. (J. Phys. Chem. A (2009), 113, 8712-8723), 
  [4] Sparta et al. in Theor. Chem. Acc. (2009), 123, 413.
 
  The force constants, equilibrium geometry and normal coordinates were taken from 
@@ -127,7 +127,7 @@ Source files
  The source files (+ corresponding headers) are the following:
 
  DVCI.cc       -> Main program.
- Shared.cc     -> Basic properties and initialization subroutines.
+ Shared.cc     -> Zeta coefficients and initialization subroutines.
  Assemblage.cc -> Subroutines for assemblage of Hamiltonian matrix.
  Generator.cc  -> Subroutines generating excitations and computing 
                    residual vectors on the fly.
@@ -193,3 +193,4 @@ In Graph.cc, the routines nested_loop and nested_loop1 are depth variable nested
  [10] How to set a variable for nested loops? 
  Posted on stackoverflow (by M Oehm) at the following address
  http://stackoverflow.com/questions/25785863/how-to-set-a-variable-for-nested-loops
+
