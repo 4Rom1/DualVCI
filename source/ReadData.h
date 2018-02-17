@@ -59,7 +59,7 @@ int GetKeyWords(FILE *file1, int *NMode, int *DoRot, int *MaxEv, int *DeltaNev, 
 int ShiftChar(char *Tab, char Spec);
 /*
  Routine returning the number of counted elements
- before meeting the first character Spec in Tab.
+ after meeting the first character Spec in Tab.
  Return -1 is no char Spec has been found before MaxChar.*/
 //
 void GetKijMonm(FILE *file, double KijCpld[],double **KijNCpld, int32_t **Monm, int NMode, double ThrPES);
@@ -77,7 +77,7 @@ int CmptEqKey(int *Tab, int Key, int taille);
 int CmptNonChar(char *Tab, char NC);
 /*
  Routine returning the number of counted elements
- before meeting the first character NC in Tab*/
+ after meeting the first character NC in Tab*/
 //
 double AdjustCoeff(double **KijNCpld, double *KijCpld,\
 int DegrePol, int NPES, int PESType, int32_t **Monm, int NMode);

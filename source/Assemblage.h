@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-    SOURCEFORGE profile of the author and updated sources can be found at 
+    Updated sources can be found at 
     https://github.com/4Rom1/DualVCI   
 */
 

@@ -41,7 +41,7 @@ int CmptNonChar(char *Tab, char NC)
 {
 /*
  Routine returning the number of counted elements
- before meeting the first character NC in Tab*/
+ after meeting the first character NC in Tab*/
 //
   int mon_i=0;
   while((mon_i<MaxChar)) {
@@ -136,7 +136,7 @@ and store positions of commas in PoCom*/
 int ShiftChar(char *Tab, char Spec) {
 /*
  Routine returning the number of counted elements
- before meeting the first character Spec in Tab.
+ after meeting the first character Spec in Tab.
  Return -1 is no char Spec has been found before MaxChar.*/
    int mon_i=0;   
     while ((Tab[mon_i] != Spec) && mon_i < MaxChar )

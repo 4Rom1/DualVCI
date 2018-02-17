@@ -162,6 +162,13 @@ In routine MomentInertie of file Shared.cc,
  Additionally to the original source provided, a description of DSYEV can be found here 
  http://www.netlib.org/lapack/explore-3.1.1-html/dsyev.f.html
 
+In routine Zeta
+
+The rotational coefficients are computed according to the method of Meal and Polo [8]
+
+[8]Vibration—Rotation Interaction in Polyatomic Molecules. II. The Determination of Coriolis Coupling Coefficients
+Janet Hawkins Meal and S. R. Polo, The Journal of Chemical Physics 1956 24:6, 1126-1133 
+
 -------------------------------------------------------------------
 
 The program uses the print banner routine taken from
@@ -171,26 +178,26 @@ The program uses the print banner routine taken from
 ------------------------------------------------
 
 In the file Graph.cc, Routines QuickSortMode, QuickSortModeShift are made
- from the Quicksort algorithm [8].
+ from the Quicksort algorithm [9].
 
- [8] C. A. R. Hoare. 1961. Algorithm 64: Quicksort. Commun. ACM 4, 7 (July 1961), 
+ [9] C. A. R. Hoare. 1961. Algorithm 64: Quicksort. Commun. ACM 4, 7 (July 1961), 
  321-. DOI=http://dx.doi.org/10.1145/366622.366644 
 
  +
 
  In the file Graph.cc, routines QsearchMode, QsearchModeShift are made 
- from half interval search algorithm also known as binary search [9].
+ from half interval search algorithm also known as binary search [10].
 
- [9] Willams, Jr., Louis F. (1975). A modification to the half-interval search 
+ [10] Willams, Jr., Louis F. (1975). A modification to the half-interval search 
  (binary search) method. Proceedings of the 14th ACM Southeast
  Conference. pp. 95–101. doi:10.1145/503561.503582.
 
 ------------------------------------------------
 
 In Graph.cc, the routines nested_loop and nested_loop1 are depth variable nested loops sharing
- the same structure as the one presented in STACKOVERFLOW [10]
+ the same structure as the one presented in STACKOVERFLOW [11]
 
- [10] How to set a variable for nested loops? 
+ [11] How to set a variable for nested loops? 
  Posted on stackoverflow (by M Oehm) at the following address
  http://stackoverflow.com/questions/25785863/how-to-set-a-variable-for-nested-loops
 

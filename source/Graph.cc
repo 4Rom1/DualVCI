@@ -278,7 +278,7 @@ size_t SizeBit=NMode*sizeof(uint8_t);
 //
 int ss=0; //Index for surface
 int go=1; //Index to continue if Tester is not negativ
-int TestNeg=0; //Test if the sum is negativ
+int TestNeg=0; //Test if the sum is negative, here only check the max dimension
 int Cpld;
 double Freq0, Freq0T;
 uint32_t SizeAv=0;
