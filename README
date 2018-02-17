@@ -127,7 +127,7 @@ Source files
  The source files (+ corresponding headers) are the following:
 
  DVCI.cc       -> Main program.
- Shared.cc     -> Zeta coefficients and initialization subroutines.
+ Shared.cc     -> Zeta coefficients[8] and initialization subroutines.
  Assemblage.cc -> Subroutines for assemblage of Hamiltonian matrix.
  Generator.cc  -> Subroutines generating excitations and computing 
                    residual vectors on the fly.
@@ -162,9 +162,8 @@ In routine MomentInertie of file Shared.cc,
  Additionally to the original source provided, a description of DSYEV can be found here 
  http://www.netlib.org/lapack/explore-3.1.1-html/dsyev.f.html
 
-In routine Zeta
-
-The rotational coefficients are computed according to the method of Meal and Polo [8]
+In routine Zeta,
+ the rotational coefficients are computed according to the method of Meal and Polo [8]
 
 [8]Vibration—Rotation Interaction in Polyatomic Molecules. II. The Determination of Coriolis Coupling Coefficients
 Janet Hawkins Meal and S. R. Polo, The Journal of Chemical Physics 1956 24:6, 1126-1133 
