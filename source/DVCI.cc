@@ -784,13 +784,13 @@ for (int jj=0;jj<NTargetStates;jj++)
  }
 }
 //
-    const uint64_t SizeRezMax=(uint32_t)((double)(SizeActMax*(NXDualHTruncPos-1))*KNREZ);
+    const uint64_t SizeRezMax=(uint64_t)((double)(SizeActMax*(NXDualHTruncPos-1))*KNREZ);
 //Allocation of the dimensions of the different arrays and configurations
      allocate_TabSize(Size,IterMax);    
      Size[1].DimAct=SizeInit; 
 //Definition of the maximal nnz elements of the active and residual matrices.    
-     const uint64_t NNZActMax=(uint32_t)((SizeActMax*(KNNZ)*(NXDualHTrunc)));
-     const uint64_t NNZRezMax=(uint32_t)((SizeActMax*(KNZREZ)*(NXDualHTrunc)));      
+     const uint64_t NNZActMax=(uint64_t)((SizeActMax*(KNNZ)*(NXDualHTrunc)));
+     const uint64_t NNZRezMax=(uint64_t)((SizeActMax*(KNZREZ)*(NXDualHTrunc)));      
     printf("\nMaximal residual space size\n SizeRezMax (=SizeActMax*(NXDualHTruncPos-1)*KNREZ) : %lu \n",SizeRezMax);
 //
     if(SizeRezMax>UINT32_MAX && DoGraph)

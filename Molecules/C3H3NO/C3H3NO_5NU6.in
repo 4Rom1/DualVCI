@@ -1,0 +1,17 @@
+NMode 18                 /  Number of normal coordinates
+PESType 0                 /  PES type of coefficients
+OutName C3H3ONO           /  Extension name for output files.
+PESName C3H3NO_FF.in      /  Name of the file of the PES.
+Memory 500
+EtaComp 2
+NAdd 200
+DoRot 2
+MaxEv 800
+Verbose 1
+GroundState 12559.9032
+TargetState 5(6)
+ThrKX 1
+Freq0Max 120000
+KNNZ 0.0001
+KNZREZ 0.0001
+KNREZ 0.0001
