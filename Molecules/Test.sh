@@ -8,6 +8,8 @@ wait
 wait
 ../../source/DVCI N2H2_FF.in 
 wait
+../../source/DVCI N2H2_NotNormal.in 
+wait
 echo "############"
 echo "Second test with minimal input file"
 echo "############"
@@ -45,6 +47,8 @@ echo "############"
 wait
 cd ../C3H3NO
 echo "############"
-echo "9th Extreme Target"
+echo "9th Not normal + Extreme Target"
 echo "############"
+../../source/DVCI C3H3NO_NotNormal.in
+wait 
 ../../source/DVCI C3H3NO_5NU6.in 

@@ -460,7 +460,11 @@ double **ZetaXYZ=NULL;
 allocate_MatDb(ZetaXYZ, ((NMode+1)*NMode)/2, ((NMode+1)*NMode)/2)
 if(DoRot)
 {
-assert(Zeta(CoorMode, NMode, NAtome, Mas, PrincAx, PrincEig, ZetaXYZ, DoRot)>0);
+ if(Zeta(CoorMode, NMode, NAtome, Mas, PrincAx, PrincEig, ZetaXYZ, DoRot)<=0)
+  {
+  FinalMessaj();
+  return 0;
+  }
 }
 //Maximal number of neighboors and maximal size of the arrays
     uint32_t NGenPoz=NMode*DegreCoupl[0]+1;//One Modal excitation+Zero excitation
@@ -789,8 +793,8 @@ for (int jj=0;jj<NTargetStates;jj++)
      allocate_TabSize(Size,IterMax);    
      Size[1].DimAct=SizeInit; 
 //Definition of the maximal nnz elements of the active and residual matrices.    
-     const uint64_t NNZActMax=(uint64_t)((SizeActMax*(KNNZ)*(NXDualHTrunc)));
-     const uint64_t NNZRezMax=(uint64_t)((SizeActMax*(KNZREZ)*(NXDualHTrunc)));      
+     const uint64_t NNZActMax=(uint64_t)((double)(SizeActMax*NXDualHTrunc)*(KNNZ));
+     const uint64_t NNZRezMax=(uint64_t)((double)(SizeActMax*NXDualHTrunc)*(KNZREZ));      
     printf("\nMaximal residual space size\n SizeRezMax (=SizeActMax*(NXDualHTruncPos-1)*KNREZ) : %lu \n",SizeRezMax);
 //
     if(SizeRezMax>UINT32_MAX && DoGraph)
