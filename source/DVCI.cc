@@ -1068,7 +1068,11 @@ Size[Iteration+2].DimAct=Size[Iteration+1].DimAct;
                MaxScreen=PosEig;
                } 
                TabScreen[NScreen]=PosEig;
-               NScreen++;     
+               NScreen++;
+               if(NTargetStates && (NScreen>=AddTarget+NTargetStates))
+               {
+               break;                   
+               }     
               if(Verbose)
               {
 //Print eigenvalue corresponding frequency, residues and ground state for PosEig=0
@@ -1094,23 +1098,27 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
 //
       if(!NScreen){
                    printf("\nNot enough eigenvalues to reach targets -> increase MaxEV or DeltaNev,\n");
+                   printf("\nor maximal components are too small -> decrease ThrCoor,\n\n");
                    printf("\nor could also be the potential badly approximated -> decrease MaxQLevel\n\n");     
-                   FinalMessaj()              
-                   return 0;                   
+                   FinalMessaj()
+                   ExitSuccess=0;              
+                   break;                   
                    }
-     if(NTargetStates && (NScreen>AddTarget+NTargetStates))
+     if(NTargetStates && (NScreen>=AddTarget+NTargetStates))
                    {
                    printf("\nToo many targets -> increase AddTarget or ThrCoor\n\n");
                    FinalMessaj()
-                   return 0;                   
+                   ExitSuccess=0;
+                   break;                   
                    }
      else if(NTargetStates && (NScreen<NTargetStates))
                    {
                    printf("\nNot enough targets screened -> decrease ThrCoor\n or increase MaxEv, DeltaNev and/or Kappa\n\n");
                    FinalMessaj()
-                   return 0;                   
+                   ExitSuccess=0;
+                   break;                   
                    }
- gettimeofday(&begin,NULL);
+    gettimeofday(&begin,NULL);
     if(DoGraph)
     {//The space H*(A) is fetched at each iteration where A is the set of added basis functions.
     CheckOutputPolyX=PolyX(ModeRez,ModeAct,DualHPos, QQ, PermutRez, PermutAct, Corres, KFC, Size,\

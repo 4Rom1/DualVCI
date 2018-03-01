@@ -50,9 +50,29 @@ echo "9th test with DeltaNEV"
 echo "############"
 ../../source/DVCI N2H2_DeltaNEV.in 
 wait
+echo "############"
+echo "10th test with ThrCoorSmall"
+echo "############"
+../../source/DVCI N2H2_ThrCoorSmall.in 
+wait
+echo "############"
+echo "11th test with ThrCoorBig"
+echo "############"
+../../source/DVCI N2H2_ThrCoorBig.in 
+wait
+echo "############"
+echo "12th test with target non reached"
+echo "############"
+../../source/DVCI N2H2TargetUnreached.in 
+wait
+echo "############"
+echo "13th test with MaxEV big ThrCoor small"
+echo "############"
+../../source/DVCI N2H2_Target_MaxEV_Big.in 
+wait
 cd ../C3H3NO
 echo "############"
-echo "10th test : not normal + Extreme Target"
+echo "14th test : not normal + Extreme Target"
 echo "############"
 ../../source/DVCI C3H3NO_NotNormal.in
 wait 

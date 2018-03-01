@@ -2,7 +2,7 @@
 # $ ./TestMemCheck.sh > MemCheck.txt 2>&1
 # The command 
 # $ grep "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" MemCheck.txt | wc -l
-# should return 11
+# should return 14
 cd N2H2
 echo "############"
 echo "First test with wrong input file"
@@ -48,8 +48,28 @@ echo "8th test with DoGraph=0"
 echo "############"
 valgrind --leak-check=full ../../source/DVCI N2H2_NoGraph.in 
 wait
+echo "############"
+echo "9th test with ThrCoorSmall"
+echo "############"
+valgrind --leak-check=full ../../source/DVCI N2H2_ThrCoorSmall.in 
+wait
+echo "############"
+echo "11th test with ThrCoorBig"
+echo "############"
+valgrind --leak-check=full ../../source/DVCI N2H2_ThrCoorBig.in 
+wait
+echo "############"
+echo "12th test with target non reached"
+echo "############"
+valgrind --leak-check=full ../../source/DVCI N2H2TargetUnreached.in 
+wait
+echo "############"
+echo "13th test with MaxEV big ThrCoor small"
+echo "############"
+valgrind --leak-check=full ../../source/DVCI N2H2_Target_MaxEV_Big.in 
+wait
 cd ../C3H3NO
 echo "############"
-echo "9th Extreme Target"
+echo "14th Extreme Target"
 echo "############"
 valgrind --leak-check=full ../../source/DVCI C3H3NO/C3H3NO_5NU6.in 

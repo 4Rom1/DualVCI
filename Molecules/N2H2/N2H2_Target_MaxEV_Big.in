@@ -1,0 +1,10 @@
+NMode 6                  /  Number of normal coordinates
+PESType 1                /  PES type of coefficients
+OutName N2H2             /  Extension name for output files.
+PESName N2H2_PES.in      /  Name of the file of the PES.
+Memory 80               /  Maximal allocated memory in mega octets.
+MaxEv 500
+TargetState 6(1)
+GroundState 6110
+Kappa 3
+ThrCoor 0.1

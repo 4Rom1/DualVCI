@@ -330,6 +330,8 @@ if(go)
 //
 if(Freq0T<=TargetMax)
    {
+   if(SizeInit<SizeActMax)
+   {
 //Test if Tester already constitutes one of the neighboors of the configuration 
 //It has to be negative if not.
 //Tester=0 and Size0.DimAct-SizeAv : no problem because CheckIn >=0 
@@ -339,19 +341,17 @@ if(Freq0T<=TargetMax)
   CheckIn=LinearModeSearch(&ModeAct[SizeAvAv], Tester, SizeBit,SizeInit-SizeAvAv+1);  
 //
     if(CheckIn<0)
-      {
-      if(SizeInit<SizeActMax)
-         {
+        {
         memcpy(ModeAct[SizeInit].Degrees,Tester,SizeBit);
         SizeInit++;
-         }
-      else{printf("***Init subpsace oversized->Increase memory***\n");return 0;}
-         }
         }
-       }
+       }  
+  else{printf("***Init subpsace oversized->Increase memory***\n");return 0;}
       }
-     } 
-    } 
+     }
+    }
+   }
+  }  
  delete [] Tester;
  return SizeInit; 
 }
