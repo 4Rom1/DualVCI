@@ -1069,7 +1069,7 @@ Size[Iteration+2].DimAct=Size[Iteration+1].DimAct;
                } 
                TabScreen[NScreen]=PosEig;
                NScreen++;
-               if(NTargetStates && (NScreen>=AddTarget+NTargetStates))
+               if(NTargetStates && (NScreen>AddTarget+NTargetStates))
                {
                break;                   
                }     
@@ -1104,7 +1104,7 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
                    ExitSuccess=0;              
                    break;                   
                    }
-     if(NTargetStates && (NScreen>=AddTarget+NTargetStates))
+     if(NTargetStates && (NScreen>AddTarget+NTargetStates))
                    {
                    printf("\nToo many targets -> increase AddTarget or ThrCoor\n\n");
                    FinalMessaj()
