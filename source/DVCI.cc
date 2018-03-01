@@ -1067,12 +1067,13 @@ Size[Iteration+2].DimAct=Size[Iteration+1].DimAct;
                {
                MaxScreen=PosEig;
                } 
-               TabScreen[NScreen]=PosEig;
-               NScreen++;
-               if(NTargetStates && (NScreen>AddTarget+NTargetStates))
+               if(NTargetStates && (NScreen>=AddTarget+NTargetStates))
                {
+               NScreen++;
                break;                   
-               }     
+               } 
+               TabScreen[NScreen]=PosEig;
+               NScreen++;    
               if(Verbose)
               {
 //Print eigenvalue corresponding frequency, residues and ground state for PosEig=0
