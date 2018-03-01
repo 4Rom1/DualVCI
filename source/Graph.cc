@@ -334,7 +334,9 @@ if(Freq0T<=TargetMax)
 //It has to be negative if not.
 //Tester=0 and Size0.DimAct-SizeAv : no problem because CheckIn >=0 
 //Tester non equal zero no problem either because not in previous checking.
-  CheckIn=LinearModeSearch(ModeAct, Tester, SizeBit,SizeInit);  
+//Checking can be done starting from previous layer because before the gap
+//will be bigger than 1 degree difference
+  CheckIn=LinearModeSearch(&ModeAct[SizeAvAv], Tester, SizeBit,SizeInit-SizeAvAv+1);  
 //
     if(CheckIn<0)
       {

@@ -1,0 +1,13 @@
+NMode 6                /  Number of normal coordinates
+PESType 0              /  PES type of coefficients
+OutName N2H2           /  Extension name for output files.
+PESName N2H2_FF.in     /  Name of the file of the PES.
+Memory 30              /  20 mega octets
+RefName N2H2_Ref1.txt  /  Name of reference file
+TargetState 2(1),2(2)
+GroundState 6110
+ThrCoor 0.4
+ThrKX 1
+MaxEV 100
+Verbose 1
+DeltaNEV 1

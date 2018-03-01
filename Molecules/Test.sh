@@ -45,9 +45,14 @@ echo "8th test with DoGraph=0"
 echo "############"
 ../../source/DVCI N2H2_NoGraph.in 
 wait
+echo "############"
+echo "9th test with DeltaNEV"
+echo "############"
+../../source/DVCI N2H2_DeltaNEV.in 
+wait
 cd ../C3H3NO
 echo "############"
-echo "9th Not normal + Extreme Target"
+echo "10th test : not normal + Extreme Target"
 echo "############"
 ../../source/DVCI C3H3NO_NotNormal.in
 wait 

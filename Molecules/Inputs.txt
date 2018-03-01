@@ -69,7 +69,7 @@ MaxEv 400
 DeltaNEV 50
 RefName CH3CN_Ref2.txt
 Verbose 1
-Memory 150
+Memory 120
 EpsRez 0.0045
 EtaComp 3
 Nadd 50
@@ -77,8 +77,8 @@ MaxAdd 2000
 KNZREZ 0.22
 KNREZ  0.28
 KNNZ 0.02
-ThrKX 1e-15
 ThrCoor 0.4
+ThrKX 1e-15
 AddTarget 4
 TargetState Fund
 @@@@@@@@@@@@@@@@@@@@@@
