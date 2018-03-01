@@ -1090,7 +1090,7 @@ Size[Iteration+2].DimAct=Size[Iteration+1].DimAct;
           }
      }
 //Update MaxEv to gain computational cost for eigensolver
-MaxEv=Min<int>(MaxEv,MaxScreen+DeltaNev);   
+NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);   
 //
       if(!NScreen){
                    printf("\nNot enough eigenvalues to reach targets -> increase MaxEV or DeltaNev,\n");
