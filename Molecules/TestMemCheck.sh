@@ -68,8 +68,9 @@ echo "13th test with MaxEV big ThrCoor small"
 echo "############"
 valgrind --leak-check=full ../../source/DVCI N2H2_Target_MaxEV_Big.in 
 wait
-cd ../C3H3NO
+cd ../H2O
 echo "############"
-echo "14th Extreme Target"
+echo "14th test : Water"
 echo "############"
-valgrind --leak-check=full ../../source/DVCI C3H3NO/C3H3NO_5NU6.in 
+valgrind --leak-check=full ../../source/DVCI H2O_Key.in
+wait

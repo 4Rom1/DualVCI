@@ -70,10 +70,32 @@ echo "13th test with MaxEV big ThrCoor small"
 echo "############"
 ../../source/DVCI N2H2_Target_MaxEV_Big.in 
 wait
+echo "############"
+echo "14th test with Kappa Small"
+echo "############"
+../../source/DVCI N2H2_KappaSmall.in
+wait
+echo "############"
+echo "15th test with MaxEV=0"
+echo "############"
+../../source/DVCI N2H2_MAXEV0.in
+wait
+echo "############"
+echo "16th test with MaxFreq=3000"
+echo "############"
+../../source/DVCI N2H2_3000.in
+wait
 cd ../C3H3NO
 echo "############"
-echo "14th test : not normal + Extreme Target"
+echo "17th test : not normal + Extreme Target"
 echo "############"
 ../../source/DVCI C3H3NO_NotNormal.in
 wait 
 ../../source/DVCI C3H3NO_5NU6.in 
+wait
+cd ../H2O
+echo "############"
+echo "18th test : Water"
+echo "############"
+../../source/DVCI H2O_Key.in
+wait

@@ -430,7 +430,7 @@ LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[
 ZetaXYZ[ijkl]=\sum_{(\alpha ,\beta)\in (x,y,z)} \mu_{\alpha,\beta}\zeta_{ij}^{\alpha}\zeta_{kl}^{\beta}.
 Omega : Harmonic force constants in Hartree : used as conversion factor i.e \sqrt{\frac{\nu_j}{\nu_i}},\sqrt{\frac{\nu_p}{\nu_m}}
 in coriolis terms.
-If TabNull[Lin]=0 then element Lin is no longer part of residual space.
+If TabNull[LinRez]=0 then element LinRez is no longer part of residual space.
 Matrix elements:
 QQ[dd].Coeff[ii][jj] are matrix elements of operator Q^ii for ii in [0,DegrePol],
 QQ[DegrePol+1].Coeff[ii][jj] are matrix elements of operator D2Q (second order derivative)
@@ -439,11 +439,11 @@ QQ[DegrePol+3].Coeff[ii][jj] are matrix elements of operator QD1Q
 QQ[DegrePol+4].Coeff[ii][jj] are matrix elements of operator D1QQ
 Size[Iteration].DimAct: Size of active space B at previous iteration;
 Size[Iteration+1].DimAct: Size of active space B at current iteration;
-Size[Iteration+1].NNZRez: NNZ of residual matrix beeing updated for TabNull[Lin]=0,
-indicating that Lin is not a member of the residual space anymore.
+Size[Iteration+1].NNZRez: NNZ of residual matrix beeing updated for TabNull[LinRez]=0,
+indicating that LinRez is not a member of the residual space anymore.
 */
 int DegrePolP1=DegrePol+1;
-uint32_t Lin=0;
+uint32_t LinRez=0;
 uint8_t *Tester=NULL; //Variable multi index during the loop     
 double MonomProd;
 long IndexEx;
@@ -456,24 +456,24 @@ for (Col=0 ; Col < Size[Iteration].DimAct ; Col++)
 { 
  for(vv=IJRez.NJ[Col];vv<IJRez.NJ[Col+1];vv++)
  {
-  Lin=IJRez.I[vv];
-  if(TabNull[Lin])
+  LinRez=IJRez.I[vv];
+  if(TabNull[LinRez])
   {
  for(int ii=0;ii<NMode;ii++)
    {
- if(ModeAct[Col].Degrees[ii]>=ModeRez[Lin].Degrees[ii])
-    {Tester[ii]=ModeAct[Col].Degrees[ii]-ModeRez[Lin].Degrees[ii];}
+ if(ModeAct[Col].Degrees[ii]>=ModeRez[LinRez].Degrees[ii])
+    {Tester[ii]=ModeAct[Col].Degrees[ii]-ModeRez[LinRez].Degrees[ii];}
  else
-    {Tester[ii]=ModeRez[Lin].Degrees[ii]-ModeAct[Col].Degrees[ii];}
+    {Tester[ii]=ModeRez[LinRez].Degrees[ii]-ModeAct[Col].Degrees[ii];}
    }
   IndexEx=QsearchMode(Tester, DualHPos,Permuter,NXDualHPlus, NMode);
 //
   MonomProd=MatrixElement (NMode, LFF[IndexEx] ,DegrePolP1,\
-       NPES, ModeAct[Col].Degrees, ModeRez[Lin].Degrees, QQ,KFC, ZetaXYZ, Omega);
+       NPES, ModeAct[Col].Degrees, ModeRez[LinRez].Degrees, QQ,KFC, ZetaXYZ, Omega);
 //
         for (int ll=0; ll < NScreen; ll++)
         {  
-        RezVect[Lin+SizeMax.DimRez*ll]+=MonomProd*\
+        RezVect[LinRez+SizeMax.DimRez*ll]+=MonomProd*\
         EigVec[TabScreen[ll]*Size[Iteration+1].DimAct+Col];
         }
    } 
@@ -485,23 +485,28 @@ for (Col=0 ; Col < Size[Iteration].DimAct ; Col++)
    uint32_t NNNZ=0;
    int AssignFirstCol;
 // 
-for (Col=0 ; Col < Size[Iteration+1].DimAct ; Col++)
+for (Col=0; Col < Size[Iteration+1].DimAct; Col++)
 {
 AssignFirstCol=1;
  for(vv=IJRez.NJ[Col];vv<IJRez.NJ[Col+1];vv++)
  {
-  Lin=IJRez.I[vv];
-  if(TabNull[Lin])
+  LinRez=IJRez.I[vv];
+  if(TabNull[LinRez])
   {
-  IJRez.I[NNNZ]=Lin;
+  IJRez.I[NNNZ]=LinRez;
   if(AssignFirstCol)//First nnz of column number Col has to be assigned
     {
     NJTmp[Col]=NNNZ;
     AssignFirstCol=0;
     }
-  NNNZ++;
-  }
+  NNNZ++;//First should be zero because NNNZ has not been incremented
+  }//But not necessary Col not necessary
  }
+// 
+  if(AssignFirstCol)//Fillin of holes
+  {
+   NJTmp[Col]=NNNZ;
+  }  
 }   
 //
 for (Col=0 ; Col < Size[Iteration+1].DimAct ; Col++)
@@ -512,5 +517,5 @@ for (Col=0 ; Col < Size[Iteration+1].DimAct ; Col++)
 IJRez.NJ[Size[Iteration+1].DimAct]=NNNZ;
 Size[Iteration+1].NNZRez=NNNZ;
 //
-delete [] NJTmp;
+delete [] NJTmp;//Works if whole between columns
 }

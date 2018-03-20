@@ -473,10 +473,13 @@ if(DoRot)
 //        
    for (int nn=2;nn<=MaxCpld;nn++)
     {
-    if(DoRot && nn<=4) //Rotational terms may increase the couplings
+    if(DoRot && nn<=4) //Rotational terms may increase the couplings, except for water...
      {
-     DegreCoupl[nn-1]=Max<int>(DegreCoupl[nn-1],4);
-     NCPol=Max<int>(NCPol,4);
+     if(NMode>3)
+      {
+      DegreCoupl[nn-1]=Max<int>(DegreCoupl[nn-1],4);
+      NCPol=Max<int>(NCPol,4);
+      }
      }
      if(DegreCoupl[nn-1]) 
      {
@@ -756,7 +759,9 @@ if(NTargetStates)
        }
       }
  else{
-     printf("Intersection nul between targets %i and interval [%f,%f]\n\n",tt,MinFreq,MaxFreq);
+     printf("Intersection nul between target ");
+     AfficheNu(TargetState[tt], NMode);
+     printf(" and initial subspace\n\n");
      FinalMessaj()
      return 0;
       }
@@ -866,7 +871,9 @@ SizeMax.NNZRez=NNZRezMax;
 //***********
 //Eigensolver
 //************
-int NEV=Min<int>(MaxEv,SizeInit-1);
+//Correction of MaxEv to maximal allowed eigenvalue position.
+MaxEv=Min<int>(MaxEv,SizeInit-1);
+int NEV=MaxEv;
 //Allocate the eigenvalues
 double *EigVal=NULL;
 EigVal=new double[NEV];
@@ -1025,7 +1032,7 @@ EigValOld=new double[NEV];
 //
     if(Verbose)
          {
-   printf("Value of DeltaFreq=Max|F_{i-1}-F_{i}|: %.1f \n",DeltaFreq);
+   printf("Value of DeltaFreq=Max_l|E_l^(j)-E_l^(j-1)|: %.1f \n",DeltaFreq);
    printf("Time spent to solve eigenvalue problem: %u s\n",time_spent);
    printf("First eigenvalues\n");
    afficheTabDb(EigVal, Min<int>(nconv,10))

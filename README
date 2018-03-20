@@ -120,9 +120,10 @@ Test cases:
  To run it tape 
  $./Convert.py oxazole_pes.mop 18
 
- Unit tests are now available in directory Molecules with the 2 shell scripts Test.sh and TestMemCheck.sh.
- The first script is a series of different cases tested one after the other, the second one  contains 
-  the same tests with Valgrind memory check.
+ Unit tests are now available in directory Molecules with the 2 shell scripts 
+ Test.sh and TestMemCheck.sh.
+ The first script is a series of different combination of parameters,
+ as the second one additionally containing memory checks with Valgrind.
 
 ---------------------------------------------------------------------------------------
 

@@ -12,10 +12,12 @@ MaxEv 22
 /GroundState 6110
 PrintOut 1
 Verbose 1
-Freq0Max 30000
+/MaxFreq 3000
+/Freq0Max 30000
 EpsRez 0.009
 /MinFreq 2000
-ThrCoor 0.4
+/ThrCoor 0.4
 ThrKX 1
 /KNZREZ 0.0001
-DoGraph 0
+DoGraph 1
+/KNNZ -1

@@ -1,0 +1,9 @@
+NMode 6                /  Number of normal coordinates
+PESType 0              /  PES type of coefficients
+OutName N2H2           /  Extension name for output files.
+PESName N2H2_FF.in     /  Name of the file of the PES.
+Memory 30              /  20 mega octets
+MaxEv 22
+MaxFreq 2000
+Kappa 0.5
+ThrKX 1
