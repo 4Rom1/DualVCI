@@ -2,7 +2,7 @@ NMode 12
 PESType 0              
 OutName C2H4_F           
 PESName C2H4_PES0.in    
-Memory 300
+Memory 340
 DoRot 1 
 EtaComp 2
 NAdd 100
@@ -15,7 +15,7 @@ Verbose 1
 KNRez 0.19
 KNNZ 0.006
 KNZREZ 0.12
-EpsRez 0.0106
+EpsRez 0.009
 Freq0Max 30000
 AddTarget 1
 Freq0Max 30000
