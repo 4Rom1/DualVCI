@@ -10,8 +10,8 @@
   DO_VIB           True
   DO_COR           True
   SPECTRUM_RANGE   4000.0
-  FC_TOL           1.0
-  MAT_ELEMS_TOL    1e-20
+  FC_TOL           0.1
+  MAT_ELEMS_TOL    1e-08
   VCI_BACKUP_FR    0.25
   N_PROCESS        0
   DO_BACKUP        True

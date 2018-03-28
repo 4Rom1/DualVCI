@@ -20,8 +20,7 @@ Freq0Max 30000
 AddTarget 1
 Freq0Max 30000
 MAXNCV 130
-ThrPES 1
+ThrPES 0.1
 AddTarget 1
 MaxQlevel 8
-
-
+ThrMat 1e-8
