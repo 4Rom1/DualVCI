@@ -5,7 +5,7 @@ PESName C2H4_PES0.in
 Memory 340
 DoRot 1 
 EtaComp 2
-NAdd 100
+NAdd 50
 MaxEv 90 
 ThrCoor 0.65
 RefName C2H4_Ref.txt
@@ -13,7 +13,7 @@ TargetState Fund
 MaxAdd 10000            /Limit number of basis function to add at each iteration
 Verbose 1
 KNRez 0.19
-KNNZ 0.006
+KNNZ 0.0065
 KNZREZ 0.12
 EpsRez 0.009
 Freq0Max 30000
@@ -24,6 +24,7 @@ ThrPES 0.1
 AddTarget 1
 MaxQlevel 8
 ThrMat 1e-8
+DeltaNEV 10
 
 |B|: 7639 , |Bs|: 2033495, 
  NNZ(Hb) : 1156244 , NNZ(Hsb) : 24339486 
