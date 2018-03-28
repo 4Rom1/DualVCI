@@ -7,14 +7,14 @@ DoRot 1
 EtaComp 2
 NAdd 100
 MaxEv 90 
-ThrCoor 0.7
+ThrCoor 0.65
 RefName C2H4_Ref.txt
 TargetState Fund
 MaxAdd 10000            /Limit number of basis function to add at each iteration
 Verbose 1
-KNRez 0.18
-KNNZ 0.007
-KNZREZ 0.13
+KNRez 0.19
+KNNZ 0.006
+KNZREZ 0.12
 EpsRez 0.01
 Freq0Max 30000
 AddTarget 1
@@ -24,3 +24,7 @@ ThrPES 0.1
 AddTarget 1
 MaxQlevel 8
 ThrMat 1e-8
+
+|B|: 7639 , |Bs|: 2033495, 
+ NNZ(Hb) : 1156244 , NNZ(Hsb) : 24339486 
+Total effective time spent: 705 s and CPU wall time 704
