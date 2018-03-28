@@ -2,20 +2,20 @@ NMode 12
 PESType 0              
 OutName C2H4_F           
 PESName C2H4_PES0.in    
-Memory 700
+Memory 300
 DoRot 1 
 EtaComp 2
 NAdd 100
 MaxEv 90 
-ThrCoor 0.6
+ThrCoor 0.7
 RefName C2H4_Ref.txt
 TargetState Fund
 MaxAdd 10000            /Limit number of basis function to add at each iteration
 Verbose 1
-KNRez 0.14
-KNNZ 0.015
+KNRez 0.18
+KNNZ 0.007
 KNZREZ 0.13
-EpsRez 0.0065
+EpsRez 0.01
 Freq0Max 30000
 AddTarget 1
 Freq0Max 30000
