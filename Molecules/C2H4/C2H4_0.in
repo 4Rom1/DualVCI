@@ -15,7 +15,7 @@ Verbose 1
 KNRez 0.19
 KNNZ 0.006
 KNZREZ 0.12
-EpsRez 0.01
+EpsRez 0.0106
 Freq0Max 30000
 AddTarget 1
 Freq0Max 30000
