@@ -87,6 +87,25 @@ Try to detect from the beginning of the line until limit=MinChar*/
      return 0;
 }
 //
+int SubStringChar (const char *str, char *new_s, char C)
+{//Read a string until C and copy it into news
+   int jj=0;
+         while ((str[jj] == ' '))
+         { 
+            jj++;
+         };
+   int ii=0;  
+   if (str != NULL)
+   {        
+        do
+         {  new_s[ii] = str[ii+jj];
+            ii++;
+         }while (str[ii+jj] != C);
+         new_s[ii] = '\0';     
+    }  
+    return ii+jj;
+}
+//
 int CmptEqKey(int *Tab, int Key, int taille) {
 /*Routine returning the number of counted elements
  equal to integer Key in Tab until taille*/
@@ -1064,3 +1083,38 @@ int GetValRef(FILE *file, double TabRef[MaxRef])
      }
   return Cnt;
 }
+unsigned int GetConfs(FILE *file, ConfigId *FinalBasis, int NMode, int* NScreens)
+{    
+//Read the final basis set file
+//FinalBasis: where the configurations are stored
+//NScreens number of Target screened
+//file:Name of the file of the final basis set
+    char chaine[MaxChar]={0};
+    int curs1=0; //Position of the cursor
+    unsigned int NBasis=0;   
+    int TmpDeg=0;
+    while (fgets ( chaine , MaxChar , file ) != NULL) 
+     {        
+        if (!( (DetectChar(chaine, '/',MinChar)) || (DetectChar(chaine, '@',MinChar)) ))
+      {
+     
+       if(DetectChar(chaine, '!',MinChar))
+       {
+       sscanf(&chaine[1], "%d", NScreens);
+       }
+       else
+       {
+       curs1=ShiftChar(&chaine[0],'[');
+       curs1++;
+       for (int ii=0;ii<NMode;ii++)
+         {
+        sscanf(&chaine[curs1],"%d", &TmpDeg);
+        FinalBasis[NBasis].Degrees[ii]=TmpDeg;
+        curs1+=CmptNonChar(&chaine[curs1],' ');
+         }
+        NBasis++;
+        }
+      }
+     }
+   {return NBasis;}    
+ } 

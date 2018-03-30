@@ -137,4 +137,11 @@ long GetNumKijCpld0(FILE *file, int NMode, double ThrPES, int *NCPol, int *Degre
 int GetValRef(FILE *file, double *TabRef);
 //Store frequencies extracted from file in TabRef
 //
+unsigned int GetConfs(FILE *file, ConfigId *FinalBasis, int NMode, int* NScreens);
+//Read the final basis set file
+//FinalBasis: where the configurations are stored
+//NScreens number of Target screened
+//file:Name of the file of the final basis set
+int SubStringChar (const char *str, char *new_s, char C);
+//Read a string until C and copy it into news
 #endif
