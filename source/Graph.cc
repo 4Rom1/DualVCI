@@ -572,7 +572,7 @@ void AfficheNuSup(ConfigId *ModeAct, double *EigVec, int NMode, uint32_t DimAct,
 }
 //
 uint32_t CptLFFPerEx (int DegrePol, int NMode, int NPES, int DoRot, uint32_t NGenPoz,\
- KForce KFC, ConfigId *XPolSupPos, int *NLFFPerEx, double **ZetaXYZ, double ThrPES)
+ KForce KFC, ConfigId *XPolSupPos, int *NLFFPerEx, double **ZetaXYZ, double ThrPES, int IncK2)
 {
 //Routine that counts the number of force constants per local force field.
 //The routine return the number of positive excitations in H*.
@@ -594,6 +594,7 @@ uint32_t CptLFFPerEx (int DegrePol, int NMode, int NPES, int DoRot, uint32_t NGe
 //ThrPES : threshold for acceptable force constants.
 //NPES : Number of coupled PES coefficients stored in KFC.KijCpld
 //ZetaXYZ[ijkl]=\sum_{(\alpha ,\beta)\in (x,y,z)} \mu_{\alpha,\beta}\zeta_{ij}^{\alpha}\zeta_{kl}^{\beta}
+//IncK2:Say if the the quadratic term should be included or not in the local force field
        uint8_t *NVMode; // Number of neighboors by dimension.
        uint8_t **ModeV; // Neighboors in each dimension. 
 //Neighboor of index mm is given by given by ModeV[NVMode[mm]][mm].
@@ -628,7 +629,7 @@ for (int mm=0; mm<NMode; mm++)
   InitTabInt(Tester, NMode)
  for (int kk=0; kk<DegrePol; kk++)
    { 
-    if(kk!=1) //Avoid Harmonic
+    if(kk!=1 || IncK2) //Avoid Harmonic
      {
     ContribLFF=SIGN<double>(KFC.KijNCpld[kk][mm])*KFC.KijNCpld[kk][mm];
      }
@@ -727,7 +728,7 @@ if(DoRot)
 //
 uint32_t AssignLFFPerEx (int DegrePol, int NMode, int DoRot, int NPES, uint32_t NXDualHPlus,\
  KForce KFC, ConfigId *DualHPos, LocalFF *LFF, double **ZetaXYZ, double ThrKX, double ThrPES,\
- uint32_t *Permuter, uint32_t *Corres)
+ uint32_t *Permuter, uint32_t *Corres, int IncK2)
 {
 //Routine that copies indexes of positive excitations of most contributing Local Force Fields
 //into Corres.
@@ -752,6 +753,7 @@ uint32_t AssignLFFPerEx (int DegrePol, int NMode, int DoRot, int NPES, uint32_t 
 //NPES : Number of coupled PES coefficients stored in KFC.KijCpld
 //ZetaXYZ[ijkl]=\sum_{(\alpha ,\beta)\in (x,y,z)} \mu_{\alpha,\beta}\zeta_{ij}^{\alpha}\zeta_{kl}^{\beta}
 //NXDualHTruncPos : output = Total number of raising excitations for H* (after truncation through ThrKX)
+//IncK2:Say if the the quadratic term should be included or not in the local force field
 //
        uint8_t *NVMode; // Number of neighboors by dimension.
        uint8_t **ModeV; // Neighboors in each dimension.
@@ -787,7 +789,7 @@ for (int mm=0; mm<NMode; mm++)
   InitTabInt(Tester, NMode)
  for (int kk=0; kk<DegrePol; kk++)
    { 
-   if(kk!=1) //Avoid Harmonic
+   if(kk!=1 || IncK2) //Avoid Harmonic
        {
     ContribLFF=SIGN<double>(KFC.KijNCpld[kk][mm])*KFC.KijNCpld[kk][mm];
        }

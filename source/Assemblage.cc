@@ -169,7 +169,7 @@ return Tot;
 
 double MatrixEvalHarm (int NMode,int DegrePolP1,int NCPol, int NPES, int *DegreCoupl,\
  ConfigId ModeLin, ConfigId ModeCol,  KForce KFC, MatrixElem *QQ, double **ZetaXYZ, double *Omega,\
- uint32_t NXDualHPlus,ConfigId *DualHPos, LocalFF *LFF, uint32_t *Permuter, int LMC)
+ uint32_t NXDualHPlus,ConfigId *DualHPos, LocalFF *LFF, uint32_t *Permuter, int LMC, int IncK2)
 {
 /*Compute matrix element between ModeLin(=multi-index Lin) and ModeCol(multi-index Col).
 Here matrix element <Phi_Lin | H |Phi_Col> involves the force constants included in
@@ -201,6 +201,7 @@ QQ[DegrePol+3].Coeff[ii][jj] are matrix elements of operator QD1Q
 QQ[DegrePol+4].Coeff[ii][jj] are matrix elements of operator D1QQ*/
 //LMC=Lin - Col : if zero then the surface IndexEx corresponds to the zero excitation
 //located in position 0. 
+//IncK2:Say if the the harmonic energy should be added (IncK2=0) or not (IncK2=1)
 //           
    double ValMat=0; 
    uint8_t *Tester; //Variable multi index during the loop
@@ -215,7 +216,10 @@ if(!LMC)
   IndexEx=0;
   ValMat=MatrixElement (NMode, LFF[IndexEx],DegrePolP1,\
        NPES, ModeLin.Degrees, ModeCol.Degrees, QQ,KFC, ZetaXYZ, Omega);
+  if(!IncK2)
+  {
   ValMat+=GetEHarmonic0(ModeLin.Degrees, NMode, KFC);
+  }
 }
 else
 {
@@ -254,7 +258,7 @@ return ValMat;
 uint32_t AssembleHarmCSC (int NMode,int DegrePol, int NCPol, int Iteration, int NPES,\
  ConfigId *ModeAct,SizeArray *Size,KForce KFC,double *ValAct, CSC IJAct, MatrixElem *QQ, int *DegreCoupl,\
  double **ZetaXYZ, double *Omega, double ThrMat, uint64_t NNZActMax,ConfigId *DualHPos, LocalFF *LFF, \
- uint32_t *Permuter, uint32_t NXDualHPlus)
+ uint32_t *Permuter, uint32_t NXDualHPlus, int IncK2)
 {
 //Assemble the graph of sparse matrix Hb in CSC format in IJAct, and compute NNZ values in ValAct.
 //Return the new number of non zero elements
@@ -286,6 +290,7 @@ Size[Iteration].NNZAct: NNZ of active matrix Hb already incremented in a previou
 Size[Iteration+1].NNZAct: Size of active space B beeing modified by the new NNZ values;
 //LMC=Lin - Col : if zero then the surface IndexEx corresponds to the zero excitation. 
 //located in position 0. 
+//IncK2:Say if the the harmonic energy should be added (IncK2=0) or not (IncK2=1)
 */
 Size[Iteration+1].NNZAct=Size[Iteration].NNZAct;
 //
@@ -302,7 +307,7 @@ for (Lin=0 ; Lin <= Col ; Lin++)
  {
  LMC=Col-Lin;
  ValMat=MatrixEvalHarm(NMode, DegrePolP1, NCPol, NPES, DegreCoupl,\
-  ModeAct[Col],ModeAct[Lin], KFC, QQ, ZetaXYZ, Omega,NXDualHPlus, DualHPos, LFF, Permuter, LMC);
+  ModeAct[Col],ModeAct[Lin], KFC, QQ, ZetaXYZ, Omega,NXDualHPlus, DualHPos, LFF, Permuter, LMC, IncK2);
 //
 if( (SIGN<double>(ValMat)*ValMat>ThrMat)  )
     {

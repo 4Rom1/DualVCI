@@ -32,9 +32,6 @@ No added elements at iteration 6
 -> Stopping criterion verified MaxRelRez = 0.0087 
 Total effective time spent: 1156 s and CPU wall time 1150 
 
-
 |B|: 9939 , |Bs|: 2424907, 
  NNZ(Hb) : 1707486 , NNZ(Hsb) : 32468270 
-
-
 

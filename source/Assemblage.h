@@ -125,12 +125,13 @@ Corresponding force constants are the one associated with index of excitation |L
 //
 double MatrixEvalHarm (int NMode,int DegrePolP1,int NCPol, int NPES, int *DegreCoupl,\
  ConfigId ModeLin, ConfigId ModeCol,  KForce KFC, MatrixElem *QQ, double **ZetaXYZ, double *Omega,\
- unsigned int NXDualHPlus,ConfigId *DualHPos, LocalFF *LFF, unsigned int *Permuter, int LMC);
+ unsigned int NXDualHPlus,ConfigId *DualHPos, LocalFF *LFF, unsigned int *Permuter, int LMC, int IncK2);
 /*Compute matrix element between ModeLin(=multi-index Lin) and ModeCol(multi-index Col).
 Here matrix element <Phi_Lin | H |Phi_Col> involves the force constants included in
 {LFF(Lin-Col)}={K_[c1, ... , cn], |Lin_i-Col_i|=ci-2ti}, 
 First is computed the differences Lin-Col, check if the set LFF non void and add the harmonic energy E_Col^0 when Col=Lin. 
 Lin-Col corresponds to an integer xx assigned to an excitation DualHPos[xx].
+IncK2:Say if the the harmonic energy should be added (IncK2=0) or not (IncK2=1)
 */ 
 //
 void FlyRezMVP2(ConfigId *ModeRez, ConfigId *ModeAct,ConfigId *DualHPos, MatrixElem *QQ,\
@@ -144,9 +145,10 @@ void FlyRezMVP2(ConfigId *ModeRez, ConfigId *ModeAct,ConfigId *DualHPos, MatrixE
 unsigned int AssembleHarmCSC (int NMode,int DegrePol, int NCPol, int Iteration, int NPES,\
  ConfigId *ModeAct,SizeArray *Size,KForce KFC,double *ValAct, CSC IJAct, MatrixElem *QQ, int *DegreCoupl,\
  double **ZetaXYZ, double *Omega, double ThrMat, uint64_t NNZActMax,ConfigId *DualHPos, LocalFF *LFF, \
- unsigned int *Permuter, unsigned int NXDualHPlus);
+ unsigned int *Permuter, unsigned int NXDualHPlus, int IncK2);
 //Assemble the graph of active sparse matrix in CSC format in IJAct, and compute NNZ values in ValAct.
 //Return the new number of non zero elements
+//IncK2:Say if the the harmonic energy should be added (IncK2=0) or not (IncK2=1)
 //
 double CorElem(uint8_t *ModeLin, uint8_t *ModeCol, int ni, int nj, int nk, int nl, MatrixElem *QQ, int DegrePolP1,\
 double *Omega, int NMode);

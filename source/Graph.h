@@ -162,20 +162,22 @@ long QsearchModeShift(uint8_t *Key, ConfigId *base, uint32_t *Permuter, uint32_t
 //Because Permuter is an array of UINT32_t
 //
 uint32_t CptLFFPerEx (int DegrePol, int NMode, int NPES, int DoCor, uint32_t NGenPoz,\
- KForce KFC, ConfigId *GenNeigh, int *NLFFPerEx, double **ZetaXYZ, double ThrPES);
+ KForce KFC, ConfigId *GenNeigh, int *NLFFPerEx, double **ZetaXYZ, double ThrPES, int IncK2);
 //Routine that counts the number of force constants per local force field.
 //The routine return the number of positive excitations in H*.
 //XPolSupPos contains the upper limit of positive excitations in H*.
 //XPolSupPos[xx].Degrees[mm] is defined for (xx,mm) in [0,NGenPoz[ x [0,NMode[.
+//IncK2:Say if the the quadratic term should be included or not in the local force field
 //
 uint32_t AssignLFFPerEx (int DegrePol, int NMode, int DoRot, int NPES, uint32_t NXDualHPlus,\
  KForce KFC, ConfigId *DualHPos, LocalFF *LFF, double **ZetaXYZ, double ThrKX, double ThrPES,\
- uint32_t *Permuter, uint32_t *Corres);
+ uint32_t *Permuter, uint32_t *Corres, int IncK2);
 //Routine that copies indexes of positive excitations of most contributing Local Force Fields
 //into Corres.
 //Corres : Correspondance array giving the indexes of the first NXDualHTruncPos most contributive positive excitations of H*.
 //Select only the ones such that Sum|FC|>ThrKX
 //DualHPos contains positive excitations in H*.
 //DualHPos[xx].Degrees[mm] is defined for (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
+//IncK2:Say if the the quadratic term should be included or not in the local force field
 //
 #endif
