@@ -2,7 +2,7 @@
 # $ ./TestMemCheck.sh > MemCheck.txt 2>&1
 # The command 
 # $ grep "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" MemCheck.txt | wc -l
-# should return 14
+# should return 19
 cd N2H2
 echo "############"
 echo "First test with wrong input file"
@@ -74,3 +74,18 @@ echo "14th test : Water"
 echo "############"
 valgrind --leak-check=full ../../source/DVCI H2O_Key.in
 wait
+echo "############"
+echo "15th test : Water transitions"
+echo "############"
+#To check good behaviours, in Transitions.cc set IncK2 to 0, comment DoRot=0 after
+#//DoRot must be set up to zero anyway, because Coriolis not part of operator
+#Then the test will be done on the regular PES files. 
+valgrind --leak-check=full ../../source/Transitions H2O_Key.in
+wait #DVCI should be re-run before
+valgrind --leak-check=full ../../source/DVCI H2O_AllIR.in
+wait
+valgrind --leak-check=full ../../source/Transitions H2O_AllIR.in
+wait #DVCI should be re-run before
+valgrind --leak-check=full ../../source/DVCI H2O_Target.in
+wait
+valgrind --leak-check=full ../../source/Transitions H2O_Target.in

@@ -99,3 +99,18 @@ echo "18th test : Water"
 echo "############"
 ../../source/DVCI H2O_Key.in
 wait
+echo "############"
+echo "19th test : Water transitions"
+echo "############"
+#To check good behaviours, in Transitions.cc set IncK2 to 0, comment DoRot=0 after
+#//DoRot must be set up to zero anyway, because Coriolis not part of operator
+#Then the test will be done on the regular PES files. 
+../../source/Transitions H2O_Key.in
+wait #DVCI should be re-run before
+../../source/DVCI H2O_AllIR.in
+wait
+../../source/Transitions H2O_AllIR.in
+wait #DVCI should be re-run before
+../../source/DVCI H2O_Target.in
+wait
+../../source/Transitions H2O_Target.in

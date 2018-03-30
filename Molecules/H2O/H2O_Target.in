@@ -7,9 +7,12 @@ DoRot 1               /  Coriolis terms added
 /Kappa 4             /  Elongation factor between zero energies and converged ones
 MaxEv 10              /  Maximum number of eigenvalues
 Verbose 1
+ThrCoor 0.4
 MaxQLevel 38
 Freq0Max 500000
-TargetState Fund
+TargetState 1(1)
+GroundState 4654.4512
 /DoGraph 0
 EpsRez 0.001
+Kappa 3
 PrintOut 1

@@ -4,12 +4,11 @@ OutName  H2O          /  Extension name for output files.
 PESName H2O_FF1.dat   /  Name of the file of the PES.
 Memory 10             /  Maximal size of the active space.
 DoRot 1               /  Coriolis terms added
-/Kappa 4             /  Elongation factor between zero energies and converged ones
 MaxEv 10              /  Maximum number of eigenvalues
 Verbose 1
+ThrCoor 0.4
 MaxQLevel 38
 Freq0Max 500000
-TargetState Fund
 /DoGraph 0
 EpsRez 0.001
 PrintOut 1

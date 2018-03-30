@@ -1,5 +1,7 @@
+@Reference Huang, X.; Lee, T. J. J. Chem. Phys. 2008, 129(4), 044312-044312-14' 
+@Taken and converted from PyPES extensible librairy : M.Sibaev, D.L. Crittenden, The PyPES library of high quality semi-global
+@potential energy surfaces, Journal of Computational Chemistry 36(29) (2015)
 COORDINATES
-@ Force field equilibrium geometry is used (extracted from PyPES)
 !  CARTESIAN bohr
   1.42916655040441e+00    9.84507382745528e-01    0.00000000000000e+00 //H
   0.00000000000000e+00   -1.24065830695376e-01    0.00000000000000e+00 //O
@@ -23,8 +25,8 @@ COORDINATES
       -0.00158165620228  -4.14495104031e-18 0.0
        0.0125510158549  -0.00973554829864  0.0
 ENDCOOR
-/ Reference Huang, X.; Lee, T. J. J. Chem. Phys. 2008, 129(4), 044312-044312-14' 
- FORCEFIELD 
+/
+FORCEFIELD 
             [0,0 , 5.66911247913e-05],
             [0,0,0 , 7.94481417502e-07],
             [0,0,0,0 , -1.6924709738e-08],

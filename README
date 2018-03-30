@@ -88,7 +88,16 @@ Execution:
  -FinalBasis.out, -Vectors.bin (if Printout=1).
  The first one print all configurations of final basis set and non zero components 
  (in absolute value) of converged eigen-pairs.
- The second one is a binary file saving vectors components for post processing purpose.   
+ The second one is a binary file saving vectors components for post processing purpose
+  with the module Transitions.   
+ It allows to get the transition moments <Phi_0 |Op|Phi_n> where
+  Op is an operator having the same format as the PES and Phi_n are targets previously
+  computed with DVCI.
+ To run Transitions:
+ $ ../../source/Transitions INPUT-Op.in
+  Where Input-Op.in should be the same file as Input.in except that PESName needs to be changed
+  with the name of the file containing the operator Op 
+  (one can also take the same PES name to do some verification as in the unitary tests).   
 
 ---------------------------------------------------------------------------------------
 
@@ -131,15 +140,17 @@ Source files
 
  The source files (+ corresponding headers) are the following:
 
- DVCI.cc       -> Main program.
- Shared.cc     -> Zeta coefficients[8] and initialization subroutines.
- Assemblage.cc -> Subroutines for assemblage of Hamiltonian matrix.
- Generator.cc  -> Subroutines generating excitations and computing 
-                   residual vectors on the fly.
- Graph.cc      -> Sorting routines, initial subspace construction 
-                   linear search and neighbors generator.
- ReadData.cc   -> Reading input and potential energy files.
- Basic.h       -> Basic subroutines.
+ DVCI.cc        -> Main program.
+ Shared.cc      -> Zeta coefficients[8] and initialization subroutines.
+ Assemblage.cc  -> Subroutines for assemblage of Hamiltonian matrix.
+ Generator.cc   -> Subroutines generating excitations and computing 
+                    residual vectors on the fly.
+ Graph.cc       -> Sorting routines, initial subspace construction 
+                    linear search and neighbors generator.
+ ReadData.cc    -> Reading input and potential energy files.
+ Basic.h        -> Basic subroutines.
+ Transitions.cc -> Transitions |<Phi_0 |Op|Phi_n>|^2 where
+                    Phi_n are targets previously computed with DVCI  
 
 
 --------Additional sources-------------------

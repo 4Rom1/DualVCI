@@ -2,10 +2,10 @@ NMode 12
 PESType 0              
 OutName C2H4_F           
 PESName C2H4_PES0.in    
-Memory 340
+Memory 400
 DoRot 1 
 EtaComp 2
-NAdd 50
+NAdd 80
 MaxEv 90 
 ThrCoor 0.65
 RefName C2H4_Ref.txt
@@ -13,19 +13,28 @@ TargetState Fund
 MaxAdd 10000            /Limit number of basis function to add at each iteration
 Verbose 1
 KNRez 0.19
-KNNZ 0.0065
-KNZREZ 0.12
-EpsRez 0.009
+KNNZ 0.008
+KNZREZ 0.13
+EpsRez 0.0087
 Freq0Max 30000
 AddTarget 1
 Freq0Max 30000
 MAXNCV 130
-ThrPES 0.1
+ThrPES 0.01
 AddTarget 1
 MaxQlevel 8
 ThrMat 1e-8
 DeltaNEV 10
 
-|B|: 7639 , |Bs|: 2033495, 
- NNZ(Hb) : 1156244 , NNZ(Hsb) : 24339486 
-Total effective time spent: 705 s and CPU wall time 704
+|B|: 9555 , |Bs|: 2349039, 
+ NNZ(Hb) : 1655553 , NNZ(Hsb) : 31121953 
+No added elements at iteration 6
+-> Stopping criterion verified MaxRelRez = 0.0087 
+Total effective time spent: 1156 s and CPU wall time 1150 
+
+
+|B|: 9939 , |Bs|: 2424907, 
+ NNZ(Hb) : 1707486 , NNZ(Hsb) : 32468270 
+
+
+
