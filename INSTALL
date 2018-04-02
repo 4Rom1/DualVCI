@@ -13,4 +13,6 @@ echo "***********************"
 make clean
 make all
 cd ..
-echo "alias DVCI='$(pwd)/source/./DVCI'" >> ~/.bashrc
+echo "alias DVCI='$(pwd)/source/DVCI'" >> ~/.bashrc
+echo "alias Transitions='$(pwd)/source/Transitions'" >> ~/.bashrc
+echo "alias FinalVCI='$(pwd)/source/FinalVCI'" >> ~/.bashrc

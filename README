@@ -94,14 +94,14 @@ Execution:
   Op is an operator having the same format as the PES and Phi_s are targets previously
   computed with DVCI (Psi_0 is the ground state).
  To run Transitions:
- $ MyDir/DualVCI/source/Transitions INPUT-Op.in
+ $ Transitions INPUT-Op.in
   Where Input-Op.in should be the same file as Input.in except that PESName needs to be changed
   with the name of the file containing the operator Op 
   (one can also take the same PES name to do some verification as in the unitary tests). 
  If PrintOut=2 the matrix of the last iteration will be saved in binary format with extension
   -Matrix.bin to re-run the last diagonalization in the final basis set.
  To do so, you just need to use exactly the same input as DVCI and hit 
- $ MyDir/DualVCI/source/FinalVCI INPUT.in
+ $ FinalVCI INPUT.in
    
 
 ---------------------------------------------------------------------------------------
