@@ -46,7 +46,7 @@ Janet Hawkins Meal and S. R. Polo, The Journal of Chemical Physics 1956 24:6, 11
 #include "stdint.h"
 #include <cstdio>
 #include <cmath>
-
+//
 #define HA_TO_CM 219474.6435
 #define AMU_TO_ME 1.660538921E-27/9.10938291E-31
 #define ME_TO_AMU 9.10938291E-31/1.660538921E-27

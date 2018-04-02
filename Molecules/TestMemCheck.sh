@@ -2,7 +2,7 @@
 # $ ./TestMemCheck.sh > MemCheck.txt 2>&1
 # The command 
 # $ grep "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" MemCheck.txt | wc -l
-# should return 19
+# should return 26
 cd N2H2
 echo "############"
 echo "First test with wrong input file"
@@ -89,3 +89,21 @@ wait #DVCI should be re-run before
 valgrind --leak-check=full ../../source/DVCI H2O_Target.in
 wait
 valgrind --leak-check=full ../../source/Transitions H2O_Target.in
+echo "############"
+echo "20th test : Water FinalVCI"
+echo "############"
+valgrind --leak-check=full ../../source/DVCI H2O_Fund.in
+wait
+valgrind --leak-check=full ../../source/FinalVCI H2O_Targ.in
+wait #DVCI should be re-run before
+../../source/DVCI H2O_AllIR2.in
+wait
+valgrind --leak-check=full ../../source/FinalVCI H2O_AllIR2.in
+wait #DVCI should be re-run before
+valgrind --leak-check=full ../../source/DVCI H2O_Target2.in
+wait
+valgrind --leak-check=full ../../source/FinalVCI H2O_Target2.in
+wait #DVCI should be re-run before
+valgrind --leak-check=full ../../source/DVCI AllIRNoRot.in
+wait
+valgrind --leak-check=full ../../source/FinalVCI AllIRNoRot.in

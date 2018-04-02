@@ -1083,38 +1083,189 @@ int GetValRef(FILE *file, double TabRef[MaxRef])
      }
   return Cnt;
 }
-unsigned int GetConfs(FILE *file, ConfigId *FinalBasis, int NMode, int* NScreens)
+//
+uint32_t GetConfsBin(FILE *FileBasis, ConfigId *&FinalBasis, int NMode, int* NScreen)
 {    
-//Read the final basis set file
+//Read the final basis set file previously stored in binary format
 //FinalBasis: where the configurations are stored
-//NScreens number of Target screened
-//file:Name of the file of the final basis set
-    char chaine[MaxChar]={0};
-    int curs1=0; //Position of the cursor
-    unsigned int NBasis=0;   
-    int TmpDeg=0;
-    while (fgets ( chaine , MaxChar , file ) != NULL) 
-     {        
-        if (!( (DetectChar(chaine, '/',MinChar)) || (DetectChar(chaine, '@',MinChar)) ))
-      {
-     
-       if(DetectChar(chaine, '!',MinChar))
-       {
-       sscanf(&chaine[1], "%d", NScreens);
-       }
-       else
-       {
-       curs1=ShiftChar(&chaine[0],'[');
-       curs1++;
-       for (int ii=0;ii<NMode;ii++)
-         {
-        sscanf(&chaine[curs1],"%d", &TmpDeg);
-        FinalBasis[NBasis].Degrees[ii]=TmpDeg;
-        curs1+=CmptNonChar(&chaine[curs1],' ');
-         }
-        NBasis++;
-        }
-      }
-     }
-   {return NBasis;}    
- } 
+//NScreen number of Target screened
+//FileBasis: name of the file of the final basis set
+uint32_t FinalSize; 
+//   
+int NScreenTMP;
+fread (&NScreenTMP, sizeof(int) , 1 , FileBasis); 
+//
+if(!NScreenTMP)
+{
+printf("\n*****DVCI should have exited with success*****\n");
+return 0;
+}
+*NScreen=NScreenTMP; 
+//read final size
+fread (&FinalSize, sizeof(uint32_t) , 1 , FileBasis); 
+//Allocate configs
+FinalBasis = new ConfigId [FinalSize];
+for (uint32_t kk = 0; kk < FinalSize; kk++)
+{InitMode(FinalBasis[kk], NMode);}
+//
+//Copy configuration arrays in binary format
+for (uint32_t ll=0;ll<FinalSize;ll++)
+ {
+fread (&FinalBasis[ll].Degrees[0], sizeof(uint8_t) , NMode , FileBasis);  
+ }
+return FinalSize;
+} 
+//
+void PrintConfsBin(char *OutBasis, ConfigId *FinalBasis, int NMode, int NScreen, uint32_t FinalSize)
+{ 
+//Print configurations of final basis set stored in FinalBasis into files with extension name
+//OutBasis, 
+//Files to write Final basis set (FileBasis) 
+     FILE *FileBasis=NULL;
+//
+     FileBasis=fopen(OutBasis,"wb");
+//First the integer giving the number of screened states.
+fwrite (&NScreen, sizeof(int) , 1 , FileBasis); 
+// 
+//Print final size
+fwrite (&FinalSize, sizeof(uint32_t) , 1 , FileBasis); 
+//Set up the ground state as the first binary eigenvector, no matter if amoung targets or not
+//Copy configuration arrays in binary format
+for (uint32_t ll=0;ll<FinalSize;ll++)
+ {
+fwrite (&FinalBasis[ll].Degrees[0], sizeof(uint8_t) , NMode , FileBasis);
+//           
+ }     
+//
+    fclose(FileBasis);
+}
+void PrintVecBin(char *OutVec, double *EigVec, double *EigVal, int NScreen,int *TabScreen, int PosZero, double GroundState, uint32_t FinalSize)
+{ 
+//OutBasis, binary eigenvector are also printed out into file having extension OutVec.
+//Files to write eigenvectors in binary format (FileVec)
+     FILE *FileVec=NULL;
+//
+     FileVec=fopen(OutVec,"wb");
+//First the integer giving the number of screened states.
+//Set up the ground state as the first binary eigenvector, no matter if amoung targets or not
+fwrite (&EigVec[PosZero*(FinalSize)] , sizeof(double) , FinalSize , FileVec);
+//Write corresponding eigenvalue in position FinalSize
+fwrite (&EigVal[PosZero], sizeof(double) , 1 , FileVec);
+//Copy configuration arrays in binary format    
+//GroundState vector already copied no needs 2 times
+int StartCpy=0;
+if(GroundState <= 0)
+ {
+ StartCpy=1;
+ }
+//
+int PosEig;
+for (int pp=StartCpy;pp<NScreen;pp++)
+ {
+PosEig=TabScreen[pp];
+fwrite (&EigVec[PosEig*(FinalSize)], sizeof(double), FinalSize, FileVec);
+//Write corresponding eigenvalue in position FinalSize
+fwrite (&EigVal[PosEig], sizeof(double) , 1 , FileVec );
+ }
+//
+    fclose(FileVec);
+}
+void PrintMatCSCBin(char *OutMat, SizeArray *Size, int Iteration, int NEV, int NCV,
+ uint32_t SizeInit, double Shift, double tol, double Ull, CSC IJ, double *ValAct)
+{
+//Print matrix Hb stored in CSC format (IJ,ValAct),
+//CSC : compressed sparse column format:
+//IJ.NJ[jj] = number of the first nnz elmement of column jj
+//IJ.I[nn] = line number of nnz element number nn 
+//IJ.I=new uint32_t [NNZAct];
+//IJ.NJ=new uint64_t [DimAct+1];
+//Size[Iteration+1].NNZAct is the number of NNZ of active matrix Hb at current iteration.
+//Size[Iteration+1].DimAct is the size of active space B at current iteration.
+//ValAct is an array of size Size[Iteration+1].NNZAct containing NNZ of active matrix Hb 
+//The matrix will be shifted as Hb=Hb-Shift*Id
+//Ull Watson : -1/8*(Sum mu_ll) correction to add to groundstate value
+//
+FILE *FileMat=NULL;
+//
+FileMat=fopen(OutMat,"wb");
+//Integers giving the number of ritz values and vectors
+fwrite (&NEV, sizeof(int) , 1 , FileMat); 
+fwrite (&NCV, sizeof(int) , 1 , FileMat); 
+//Initial subspace size
+fwrite (&SizeInit, sizeof(uint32_t) , 1 , FileMat); 
+//The shift, tolerance and Watson correction
+fwrite (&Shift, sizeof(double) , 1 , FileMat); 
+fwrite (&tol, sizeof(double) , 1 , FileMat); 
+fwrite (&Ull, sizeof(double) , 1 , FileMat);
+//Integers giving the dimensions.
+fwrite (&Size[Iteration+1].DimAct, sizeof(uint32_t) , 1 , FileMat); 
+fwrite (&Size[Iteration+1].NNZAct, sizeof(uint64_t) , 1 , FileMat); 
+//Matrix pointers and entries
+fwrite (&IJ.NJ[0], sizeof(uint64_t) , Size[Iteration+1].DimAct+1 , FileMat); 
+fwrite (&IJ.I[0], sizeof(uint32_t) , Size[Iteration+1].NNZAct , FileMat); 
+fwrite (&ValAct[0], sizeof(double) , Size[Iteration+1].NNZAct , FileMat); 
+//
+fclose(FileMat);
+}
+int ReadMatCSCBin(FILE *FileMat,  int *NEV, int *NCV, uint32_t *SizeInit, uint32_t *DimAct, uint64_t *NNZAct,
+ double *Shift, double *tol, double *Ull, CSC &IJ, double *&ValAct)
+{
+//Print matrix Hb stored in CSC format (IJ,ValAct),
+//CSC : compressed sparse column format:
+//IJ.NJ[jj] = number of the first nnz elmement of column jj
+//IJ.I[nn] = line number of nnz element number nn 
+//IJ.I=new uint32_t [NNZAct];
+//IJ.NJ=new uint64_t [DimAct+1];
+//Size[Iteration+1].NNZAct is the number of NNZ of active matrix Hb at current iteration.
+//Size[Iteration+1].DimAct is the size of active space B at current iteration.
+//ValAct is an array of size Size[Iteration+1].NNZAct containing NNZ of active matrix Hb 
+//The matrix will be shifted as Hb=Hb-Shift*Id
+//
+//Start by dimensions
+//Integers giving the number of ritz values and vectors
+int NEVTmp,NCVTmp;
+fread (&NEVTmp, sizeof(int) , 1 , FileMat); 
+//Something bad happened previously
+if(!NEVTmp)
+{
+printf("\n*****DVCI should have exited with success*****\n");
+return 0;
+}
+//
+fread (&NCVTmp, sizeof(int) , 1 , FileMat); 
+*NEV=NEVTmp;
+*NCV=NCVTmp;
+//
+uint32_t SizeTmp;
+fread (&SizeTmp, sizeof(uint32_t) , 1 , FileMat); 
+*SizeInit=SizeTmp;
+//The shift and tolerance
+double ShiftTmp,tolTmp,UllTmp;
+fread (&ShiftTmp, sizeof(double) , 1 , FileMat); 
+fread (&tolTmp, sizeof(double) , 1 , FileMat); 
+fread (&UllTmp, sizeof(double) , 1 , FileMat); 
+*Shift=ShiftTmp;
+*tol=tolTmp;
+*Ull=UllTmp;
+//Integers giving the dimensions
+uint32_t DimActTmp;
+uint64_t NNZActTmp;
+fread (&DimActTmp, sizeof(uint32_t) , 1 , FileMat); 
+fread (&NNZActTmp, sizeof(uint64_t) , 1 , FileMat); 
+*DimAct=DimActTmp;
+*NNZAct=NNZActTmp;
+//printf("\n *DimAct %u, *NNZAct %lu,\n",*DimAct,*NNZAct);
+//Matrix pointers and entries
+//Need to allocate first
+   IJ.I=NULL;
+   IJ.NJ=NULL;
+   IJ.I=new uint32_t [*NNZAct];
+   IJ.NJ=new uint64_t [*DimAct+1];
+   ValAct=new double [*NNZAct];
+//IJAct.NJ[jj],IJ.I[nn] in [0,DimAct[ x [0,NNZAct[
+fread (&IJ.NJ[0], sizeof(uint64_t) , *DimAct+1 , FileMat); 
+fread (&IJ.I[0], sizeof(uint32_t) , *NNZAct , FileMat); 
+fread (&ValAct[0], sizeof(double) , *NNZAct , FileMat); 
+//
+return NEVTmp;
+}

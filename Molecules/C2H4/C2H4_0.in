@@ -8,7 +8,7 @@ EtaComp 2
 NAdd 80
 MaxEv 90 
 ThrCoor 0.65
-RefName C2H4_Ref.txt
+RefName C2H4_RefPyVCI.txt
 TargetState Fund
 MaxAdd 10000            /Limit number of basis function to add at each iteration
 Verbose 1
@@ -25,6 +25,7 @@ AddTarget 1
 MaxQlevel 8
 ThrMat 1e-8
 DeltaNEV 10
+PrintOut 2
 
 |B|: 9555 , |Bs|: 2349039, 
  NNZ(Hb) : 1655553 , NNZ(Hsb) : 31121953 

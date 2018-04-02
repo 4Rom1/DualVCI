@@ -1,0 +1,16 @@
+NMode 3               /  Number of normal coordinates
+PESType 1             /  PES type of coefficients: Here dimesionless normal coordinates
+OutName  H2O          /  Extension name for output files.
+PESName H2O_FF1.dat   /  Name of the file of the PES.
+Memory 10             /  Maximal size of the active space.
+DoRot 0               /  Coriolis terms added
+MaxEv 10              /  Maximum number of eigenvalues
+Verbose 1
+ThrCoor 0.4
+MaxQLevel 38
+Freq0Max 500000
+/DoGraph 0
+EpsRez 0.001
+PrintOut 2
+RefName RefH2O.txt
+GroundState 4654.4512

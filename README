@@ -85,19 +85,24 @@ Execution:
 
  The informations of the frequencies, residues, assignment and CPU time will
  be displayed in output. Additionally you'll see 2 other files with respective extension 
- -FinalBasis.out, -Vectors.bin (if Printout=1).
+ -FinalBasis.in, -Vectors.bin (if Printout=1).
  The first one print all configurations of final basis set and non zero components 
  (in absolute value) of converged eigen-pairs.
  The second one is a binary file saving vectors components for post processing purpose
   with the module Transitions.   
- It allows to get the transition moments <Phi_0 |Op|Phi_n> where
-  Op is an operator having the same format as the PES and Phi_n are targets previously
-  computed with DVCI.
+ It allows to get the transition moments <Psi_0 |Op|Psi_n> where
+  Op is an operator having the same format as the PES and Phi_s are targets previously
+  computed with DVCI and Psi_0 the ground state.
  To run Transitions:
  $ ../../source/Transitions INPUT-Op.in
   Where Input-Op.in should be the same file as Input.in except that PESName needs to be changed
   with the name of the file containing the operator Op 
-  (one can also take the same PES name to do some verification as in the unitary tests).   
+  (one can also take the same PES name to do some verification as in the unitary tests). 
+ If PrintOut=2 the matrix of the last iteration will be saved in binary format with extension
+  -Matrix.bin to re-run the last diagonalization in the final basis set.
+ To do so you just need to use exactly the same input used for DVCI and hit 
+ $ ../../source/FinalVCI INPUT.in
+   
 
 ---------------------------------------------------------------------------------------
 

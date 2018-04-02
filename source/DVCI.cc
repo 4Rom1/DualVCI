@@ -24,10 +24,10 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "Shared.h"
 #include <sys/time.h>
 #include "Graph.h"
 #include "ReadData.h"
-#include "Shared.h"
 #include "Assemblage.h"
 #include "Basic.h"
 #include "Solver2.h"
@@ -290,25 +290,23 @@ else{printf("\n FileRef detected \n");}
   char OutBasis[MaxChar]={0};
   char OutVec[MaxChar]={0};
 //
-  char BasisOut[30]="-FinalBasis.out";//Final basis file name if PrintOut > 0
-  char VectOut[30]="-Vectors.bin";//Binary file name with targeted eigenvectors if PrintOut > 0
+  char OutMat[MaxChar]={0};
 //
-  sprintf(OutBasis, "%s", OutName);
+  char BasisOut[30]="-FinalBasis.bin";//Final basis file name if PrintOut = 1
+//
+  char VectOut[30]="-Vectors.bin";//Binary file name with targeted eigenvectors if PrintOut = 1
+//
+  char MatOut[30]="-Matrix.bin";//Binary file name with targeted eigenvectors if PrintOut > 1 
+//
   sprintf(OutVec, "%s", OutName);
-// 
+  sprintf(OutBasis, "%s", OutName);
+  sprintf(OutMat, "%s", OutName);
+//
   strcat(OutBasis, BasisOut);
   strcat(OutVec, VectOut);
+  strcat(OutMat, MatOut);
 //
 //Files to write Final basis set (FileBasis) and eigenvectors in binary form(FileVec)
-//
-    FILE *FileBasis=NULL;
-    FILE *FileVec=NULL;
-//
-     if(PrintOut)
-     {
-     FileVec=fopen(OutVec,"wb");
-     FileBasis=fopen(OutBasis,"w");
-     }
 //      
       if(PESType)//Derivatives in a.u
       {LinesKijCpld=GetNumKijCpld(FilePES, NMode, ThrPES, &NCPol, &DegrePol, DegreCoupl);}
@@ -434,13 +432,14 @@ printf("%u]\n",Pid[NMode-1]-1);
        FreeTab(KijCpld)
        FreeMat(KijNCpld,DegrePol) 
 //
+double Ull=0;//Watson term
 if(DoRot)
 {
 //Compute center of Mass
 MassCenter(Mas, CoorCart, NAtome, MassC);
 //Compute principal axes of moment of inertia: Axes and values
-double Ull=MomentInertie(Mas, CoorCart, NAtome, MassC, PrincAx, PrincEig);//Watson Correction
-printf("\n*** Watson term = -1/8*(Sum U_ll) %.4f ***\n\n",Ull); 
+Ull=MomentInertie(Mas, CoorCart, NAtome, MassC, PrincAx, PrincEig);//Watson Correction
+printf("\n*** Watson term = -1/8*(Sum mu_ll) %.4f ***\n\n",Ull); 
 if(Verbose)
 {
 printf("\n*** Center of masses ***\n");
@@ -662,7 +661,7 @@ uint32_t SizeInit;//Intial subspace size
        MaxFreq=MinMaxFreq;
        MinFreq=-100;
       }
-      else if ((MinFreq>0) && (GroundState <=0)) 
+      if ((MinFreq>0) && (GroundState <=0)) 
       {
        printf("\n***GroundState value must be specified for window target when MinFreq>0***\n\n");
        FinalMessaj()
@@ -783,6 +782,12 @@ printf("\n");
  if(detect<0 && GroundState <= 0)
       {
      printf("\n**Ground state value must be provided when not included in targets **\n\n");
+     FinalMessaj()
+     return 0;
+      }
+ else if(detect>=0 && GroundState > 0)
+      {
+     printf("\n**Ground state cannot be among targets when GroundState > 0**\n\n");
      FinalMessaj()
      return 0;
       }
@@ -931,7 +936,7 @@ int NCV=MAXNCV; //Maximal number of Lanczos basis vectors
     int *TabScreen;
     TabScreen=new int[NScreen];//Indexes of screened eigenvalues 
 //Initialise TabScreen
-       for (int tt=0;tt<NTargetStates;tt++)
+       for (int tt=0;tt<NScreen;tt++)
         {
         TabScreen[tt]=tt;
         }
@@ -1199,7 +1204,7 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
      { 
               RezRel[ll]=Norm2F(&RezVect[SizeRezMax*ll],Size[Iteration+1].DimRez)/EigVal[TabScreen[ll]];           
 //
-              if(TabScreen[ll]==PosZero)
+              if(TabScreen[ll]==PosZero)//Last position of zero readed
                {
               printf("   %d   |  %.4f  |  %.4f  | ",\
               TabScreen[ll],EigVal[TabScreen[ll]],RezRel[ll]);           
@@ -1288,6 +1293,8 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
      printf("\n|B|: %u , |Bs|: %lu, \n NNZ(Hb) : %lu , NNZ(Hsb) : %lu \n",\
      Size[Iteration+1].DimAct, Size[Iteration+1].DimRez, Size[Iteration+1].NNZAct, Size[Iteration+1].NNZRez);
      printf("No added elements at iteration %i\n-> Stopping criterion verified MaxRelRez = %.4f \n",Iteration,MaxRelRez);     
+     MaxRelRez=0;
+     break;
      }
 //
      Iteration++;     
@@ -1296,6 +1303,7 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
              {
              printf("Maximal number of iteration reached at iteration %i -> algorithm stop\n \n",Iteration);
              MaxRelRez=0;
+             break;
              }
  }//End of iterations 
 //
@@ -1313,17 +1321,18 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
     printf("Total CPU wall time: ");
     ConvertTimeS(CPUTime);
 //
-    if(ExitSuccess)
-      {
+if(ExitSuccess)
+ {
       double TabRef[MaxRef]={0}; //Array to store the reference values
           if(FileRef!=NULL)
           {
                 printf("\n %d lines detected in Reference file\n",GetValRef(FileRef, TabRef));
                 printf("\n Assignment  | Frequency | Relativ | Error  || \n");
-                printf(" (Component) | (number)  | Residue | Here-Ref || \n");
+                printf(" (Component) | (number)  | Residue | Ref-Here || \n");
                 printf("------------------------------------ \n");              
           }
-     int ss=0;          
+     int ss=0;    
+     int SaveZero=0;//Last position of zero readed      
      for (int PosEig=0;PosEig<nconv;PosEig++)
      {   
     DetectZero=0; //If >0 the groundstate has been detected
@@ -1336,7 +1345,8 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
         DetectZero=DetectMaxCoordinate(&EigVec[PosEig*Size[Iteration+1].DimAct], PositionTarget, 1,ThrCoor);
         if(DetectZero)
          {
-         PosZero=PosEig;         
+         PosZero=PosEig; 
+         SaveZero=PosEig;      
          Ground=EigVal[PosEig];
          } 
         }
@@ -1349,8 +1359,17 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
 //                  
            if(PosEig==PosZero)
            {
-           printf(" | %.2f(%d) | %.4f | %.4f // \n \n", \
-           Ground,PosEig,RezRel[ss],GetClosest(TabRef,Ground)-(Ground));
+           if(!DoRot)
+            {
+            printf(" | %.2f(%d) | %.4f | %.4f // \n \n", \
+            Ground,PosEig,RezRel[ss],GetClosest(TabRef,Ground)-(Ground));
+            }
+           else//Add Watson
+            {
+           printf(" | %.2f(%d) | %.4f | %.4f  || %.4f (Watson term) // \n \n", \
+           Ground,PosEig,RezRel[ss],GetClosest(TabRef,Ground)-(Ground),Ull);//Add watson
+            }
+//
            }
            else
            {
@@ -1358,95 +1377,38 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
            EigVal[PosEig]-Ground,PosEig,RezRel[ss],GetClosest(TabRef,EigVal[PosEig]-Ground)-(EigVal[PosEig]-Ground));
            }         
            ss++;                                                                                                          
-          }
-          }
-        }
-//
-if(PrintOut)//Print final basis set in FileBasis
-{
-fprintf(FileBasis,"//First elements of final basis set or the whole basis if PrintOut>0 ,\n");
-fprintf(FileBasis,"//+ non zero components of targeted states with corresponding eigenvalue number in parenthesis\n");
-//
-fprintf(FileBasis,"! %d Number of screened states\n",NScreen); 
-// 
-uint32_t show;
-//
-show=Size[Iteration+1].DimAct;
-//
-//Set up the ground state as the first binary eigenvector, no matter if amoung targets or not
-    PosZero=0;
-    int ZeroPoz[1]={0};
-    for (int PosEig=0;PosEig<nconv;PosEig++)
-      {                
-        DetectZero=DetectMaxCoordinate(&EigVec[PosEig*Size[Iteration+1].DimAct], ZeroPoz, 1,ThrCoor);
-        if(DetectZero)
-         {
-         PosZero=PosEig; 
-         }        
-      }
-            fwrite (&EigVec[PosZero*(Size[Iteration+1].DimAct)] , sizeof(double) , Size[Iteration+1].DimAct , FileVec );
-            //Write corresponding eigenvalue in position Size[Iteration+1].DimAct
-            fwrite (&EigVal[PosZero], sizeof(double) , 1 , FileVec );
-//
-for (uint32_t ll=0;ll<show;ll++)
-{
- fprintf(FileBasis,"[ ");
- for (int mm=0;mm<NMode;mm++)
-        {
-  fprintf(FileBasis,"%d ",ModeAct[ll].Degrees[mm]);
-	}
-//
-    fprintf(FileBasis,"]");
-//
-    for (int PosEig=0;PosEig<nconv;PosEig++)
-      {                
-    DetectZero=0;
-    detect=1;
-    PosZero=-1;              
-//
-       if(GroundState<=0)
-        {
-        DetectZero=DetectMaxCoordinate(&EigVec[PosEig*Size[Iteration+1].DimAct], PositionTarget, 1,ThrCoor);
-        if(DetectZero)
-         {
-         PosZero=PosEig;         
-         Ground=EigVal[PosEig];
-         } 
-        }
-//
-        if(NTargetStates && !DetectZero)
-        {detect=DetectMaxCoordinate(&EigVec[PosEig*Size[Iteration+1].DimAct], PositionTarget, NTargetStates,ThrCoor);}
-//                 
-        if( ((EigVal[PosEig]-Ground <= MaxFreq+DeltaFreq) && (EigVal[PosEig]-Ground >= MinFreq)) && (detect || DetectZero) )
-         {           
-          double AbsVal=(EigVec[PosEig*Size[Iteration+1].DimAct+ll])*SIGN<double>(EigVec[PosEig*Size[Iteration+1].DimAct+ll]);
-          if(AbsVal>ThrCoor)
-           {
-           fprintf(FileBasis, " %3.1f(%d) ",AbsVal,PosEig);
            }
-           if(!ll && !DetectZero)//Only print for the first showed state to avoid many copies of same vectors,
-           {//and groundState already copied
-            fwrite (&EigVec[PosEig*(Size[Iteration+1].DimAct)] , sizeof(double) , Size[Iteration+1].DimAct , FileVec );
-            //Write corresponding eigenvalue in position Size[Iteration+1].DimAct
-            fwrite (&EigVal[PosEig], sizeof(double) , 1 , FileVec );             
-           }  
-         }           
-      }
-    fprintf(FileBasis,"\n"); 
-   }  
-  }//If PrintOut   
- }//If exitsuccess
+          }
+        }
+//
+if(PrintOut==1)//Print final basis set in FileBasis
+ {
+PrintConfsBin(OutBasis,ModeAct, NMode, NScreen, Size[Iteration+1].DimAct);
+//
+PrintVecBin(OutVec, EigVec, EigVal, NScreen,TabScreen, SaveZero, GroundState, Size[Iteration+1].DimAct);
+ }
+if(PrintOut>1)//Matrix in binary
+ {
+ PrintMatCSCBin(OutMat, Size, Iteration, NEV, NCV, SizeInit, Shift, Tol, Ull, IJAct, ValAct);
+ PrintConfsBin(OutBasis,ModeAct, NMode, NScreen, Size[Iteration+1].DimAct);
+ }
+}//If exitsuccess
+else if(!ExitSuccess && PrintOut)////Indicate non success with null value into binarry files
+{
+FILE *FileMat=fopen(OutMat,"wb");
+FILE *FileBasis=fopen(OutBasis,"wb");
+//
+fwrite (&ExitSuccess, sizeof(int) , 1 , FileMat); 
+fwrite (&ExitSuccess, sizeof(int) , 1 , FileBasis);
+// 
+fclose(FileMat);
+fclose(FileBasis);
+}
 //
     fclose(FileKey);
     fclose(FilePES);
 //
     if(FileRef!=NULL){fclose(FileRef);}
-//
-    if(PrintOut)
-    {
-    fclose(FileBasis);
-    fclose(FileVec);
-    }
 //
      FreeTabMode(ModeAct,SizeActMax)
 //  

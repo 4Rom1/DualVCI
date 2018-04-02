@@ -25,9 +25,9 @@
 #include <math.h>
 #include <string.h>
 #include <sys/time.h>
+#include "Shared.h"
 #include "Graph.h"
 #include "ReadData.h"
-#include "Shared.h"
 #include "Assemblage.h"
 #include "Basic.h"
 #include "Solver2.h"
@@ -36,7 +36,7 @@
 //#include <omp.h> might be used in parallel version
 #include <limits.h>
 //
-#define IncK2 1
+#define IncK2 0
 //IncK2:Say if the the quadratic term should be included or not in the local force field,
 //also say if the harmonic energy should be added to diagonal elements (IncK2=0) or not (IncK2=1)
 int main(int argc, char *argv[])
@@ -239,9 +239,9 @@ FinalMessaj()
 return 0;
 }
 //
-if(!PrintOut)
+if(PrintOut !=1)
 {
-printf("\nPrintOut must be positif to save basis set by previous DVCI run \n\n");
+printf("\n***PrintOut must be equal to 1 and basis set saved from previous DVCI run*** \n\n");
 FinalMessaj()
 return 0;
 }
@@ -296,9 +296,9 @@ else{printf("\n FileRef detected \n");}
 //
   char OutBasis[MaxChar]={0};
 //
-  char BasisOut[30]="-FinalBasis.out";//Final basis file name if PrintOut > 0
+  char BasisOut[30]="-FinalBasis.bin";//Final basis file name if PrintOut = 1
 //
-  char VectOut[30]="-Vectors.bin";//Binary file name with targeted eigenvectors if PrintOut > 0
+  char VectOut[30]="-Vectors.bin";//Binary file name with targeted eigenvectors if PrintOut = 1
 //
   sprintf(OutVec, "%s", OutName);
   sprintf(OutBasis, "%s", OutName);
@@ -310,7 +310,7 @@ else{printf("\n FileRef detected \n");}
   FILE *FileBasis=NULL;
 //     
   FileVec=fopen(OutVec,"rb");
-  FileBasis=fopen(OutBasis,"r");   
+  FileBasis=fopen(OutBasis,"rb");   
 //
   if (FileVec == NULL || FileBasis==NULL)
    {
@@ -378,7 +378,7 @@ double PrincEig[3]={0};
    {printf("\n *** Coordinates, masses and equilibrium geometry readed *** \n");}
 //
 //DoRot must be set up to zero anyway, because Coriolis not part of operator
-  DoRot=0;
+//DoRot=0;
   double *Omega=new double[NMode];//Omega is used as converter from Hartree to cm-1
 //
 uint8_t *Pid=NULL;//Degrees in each direction
@@ -665,7 +665,7 @@ uint32_t FinalSize;//Final space size
        MaxFreq=MinMaxFreq;
        MinFreq=-100;
       }
-      else if ((MinFreq>0) && (GroundState <=0)) 
+      if ((MinFreq>0) && (GroundState <=0)) 
       {
        printf("\n***GroundState value must be specified for window target when MinFreq>0***\n\n");
        FinalMessaj()
@@ -709,9 +709,6 @@ uint32_t FinalSize;//Final space size
           FinalMessaj()
           return 0;
          }         
-//Initial subspace construction    
-     allocate_TabMode(ModeAct,SizeActMax)
-//ModeAct : Multi-dimensional array for active space B : ModeAct[nn].Degrees[mm], (nn,ii) in [0,SizeActMax[ x [0,NMode[.
      double TargetFreq=Kappa*MaxFreq; // Target frequency for initial subspace construction.
 //
 //     printf("\nMaximal energy for initial subspace construction\n %f cm-1 = kappa*(MaxFreq) \n", TargetFreq);        
@@ -735,9 +732,11 @@ to avoid null intersection with targets\n",MaxFreq);
      CPUBeginAll = clock();
 //
 //
-    int NScreens=0;//NUmber of screened states in output
+    int NScreen=0;//NUmber of screened states in output
 //
-    FinalSize=GetConfs(FileBasis, ModeAct, NMode, &NScreens);
+ConfigId *ModeAct=NULL;
+//
+    FinalSize=GetConfsBin(FileBasis, ModeAct, NMode, &NScreen);
     if(!FinalSize){
                   printf("No basis set detected.\n");
                   printf("To use this programm first run DVCI to save final basis set.\n");
@@ -749,14 +748,14 @@ to avoid null intersection with targets\n",MaxFreq);
                   printf("Final basis set detected \n");
                   }   
 //         
-      printf("\nFinal basis set size %u , number of targets %i \n",FinalSize,NScreens);
+      printf("\nFinal basis set size %u , number of targets %i \n",FinalSize,NScreen);
 //
 if(GroundState > 0)
 {
-NScreens++;
-printf("\nGroundState not into targets then NScreens incremented\n");
+NScreen++;
+printf("\nGroundState not into targets then NScreen incremented\n");
 } 
-     int *PositionTarget=new int[NScreens+1]; //For zero
+     int *PositionTarget=new int[NScreen+1]; //For zero
 //
       if(GroundState<=0)
         {
@@ -785,7 +784,7 @@ if(NTargetStates)
        }
       }
  else{
-     printf("Intersection nul between target ");
+     printf("Intersection nul between target");
      AfficheNu(TargetState[tt], NMode);
      printf(" and initial subspace\n\n");
      FinalMessaj()
@@ -801,7 +800,7 @@ printf("\n\n");
      FinalMessaj()
      return 0;
       }
- else if(detect>0 && GroundState > 0)
+ else if(detect>=0 && GroundState > 0)
       {
      printf("\n**Ground state cannot be among targets when GroundState > 0 **\n\n");
      FinalMessaj()
@@ -826,7 +825,7 @@ for (int jj=0;jj<NTargetStates;jj++)
 }
 else
 {
- for (int tt=0;tt<NScreens;tt++)
+ for (int tt=0;tt<NScreen;tt++)
  {
  PositionTarget[tt]=tt;
  }
@@ -836,7 +835,7 @@ else
 //    Maximal NNZs  
       const uint64_t NNZActMax=(uint64_t)((double)(SizeActMax*NXDualHTrunc)*(KNNZ));
 //    Allocate CSC pointers  
-      AllocateCSC(IJAct,NNZActMax,SizeActMax)//IJAct.NJ[jj],IJ.I[nn] in [0,SizeActMax[ x [0,NNZActMax[
+      AllocateCSC(IJAct,NNZActMax,FinalSize)//IJAct.NJ[jj],IJ.I[nn] in [0,FinalSize[ x [0,NNZActMax[
 //    CSC values
       double *ValAct=NULL;
       ValAct=new double[NNZActMax];
@@ -857,9 +856,9 @@ else
 //
 //Read Vectors from binary file and corresponding eigenvalue in position Size[1].DimAct*ii
       double *EigVec=NULL;
-      EigVec=new double[(Size[1].DimAct+1)*NScreens];
+      EigVec=new double[(Size[1].DimAct+1)*NScreen];
 //
-      for (int ii=0;ii<NScreens; ii++)
+      for (int ii=0;ii<NScreen; ii++)
        {
        fread (&EigVec[ii*(Size[1].DimAct+1)] , sizeof(double) , Size[1].DimAct+1 , FileVec );
        }
@@ -885,11 +884,11 @@ else
        printf("E0 calculated when not included into targets : %f\n",EigVec[Size[1].DimAct]); 
        int *PositionTTmp=new int[NTargetStates+1]; //For zero
        PositionTTmp[0]=0;
-       for (int ii=0;ii<NScreens-1; ii++)
+       for (int ii=0;ii<NScreen-1; ii++)
         {
        PositionTTmp[ii+1]=PositionTarget[ii];
         }
-       for (int ii=0;ii<NScreens; ii++)
+       for (int ii=0;ii<NScreen; ii++)
         {
        PositionTarget[ii]=PositionTTmp[ii];
         }
@@ -898,7 +897,7 @@ else
 //Compute Op*VecE0
        SparseSymCSC(EigVec,Y,IJAct, ValAct,Size[1]);
 //
-       for (int ii=0;ii<NScreens; ii++)
+       for (int ii=0;ii<NScreen; ii++)
        {
        double Trans=ScualProd(&EigVec[ii*(Size[1].DimAct+1)],Y, Size[1].DimAct);
        printf("< Phi_0 | %s |  Phi_%d > : %f ,\n",DipoleChar,PositionTarget[ii],Trans);
@@ -928,7 +927,7 @@ else
     fclose(FileKey);
     fclose(FilePES);
 //
-     FreeTabMode(ModeAct,SizeActMax)
+     FreeTabMode(ModeAct,FinalSize)
 //  
      FreeTabMode(DualHPos,NXDualHPlus) 
 //

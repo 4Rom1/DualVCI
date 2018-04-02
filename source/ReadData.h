@@ -137,11 +137,33 @@ long GetNumKijCpld0(FILE *file, int NMode, double ThrPES, int *NCPol, int *Degre
 int GetValRef(FILE *file, double *TabRef);
 //Store frequencies extracted from file in TabRef
 //
-unsigned int GetConfs(FILE *file, ConfigId *FinalBasis, int NMode, int* NScreens);
-//Read the final basis set file
-//FinalBasis: where the configurations are stored
-//NScreens number of Target screened
-//file:Name of the file of the final basis set
 int SubStringChar (const char *str, char *new_s, char C);
 //Read a string until C and copy it into news
+void PrintConfsBin(char *OutBasis, ConfigId *FinalBasis, int NMode, int NScreen, uint32_t FinalSize);
+//Print configurations of final basis set stored in FinalBasis into files with extension name
+//OutBasis
+uint32_t GetConfsBin(FILE *FileBasis, ConfigId *&FinalBasis, int NMode, int* NScreen);
+//Read the final basis set file previously stored in binary format
+//FinalBasis: where the configurations are stored
+//NScreen number of Target screened
+//FileBasis: name of the file of the final basis set
+void PrintMatCSCBin(char *MatOut, SizeArray *Size, int Iteration, int NEV, int NCV, uint32_t SizeInit,\
+ double Shift, double tol, double Ull, CSC IJ, double *ValAct);
+//Print matrix Hb stored in CSC format (IJ,ValAct),
+//CSC : compressed sparse column format:
+//IJ.NJ[jj] = number of the first nnz elmement of column jj
+//IJ.I[nn] = line number of nnz element number nn 
+//Size[Iteration+1].NNZAct is the number of NNZ of active matrix Hb at current iteration.
+//Size[Iteration+1].DimAct is the size of active space B at current iteration.
+//ValAct is an array of size Size[Iteration+1].NNZAct containing NNZ of active matrix Hb 
+//The matrix will be shifted as Hb=Hb-Shift*Id
+int ReadMatCSCBin(FILE *FileMat,  int *NEV, int *NCV, uint32_t *SizeInit, uint32_t *DimAct, uint64_t *NNZAct,\
+ double *Shift, double *tol, double *Ull, CSC &IJ, double *&ValAct);
+//Read matrix Hb stored in CSC format (IJ,ValAct),
+//IJ.I=new uint32_t [NNZAct];
+//IJ.NJ=new uint64_t [DimAct+1];
+//Ull Watson term: -1/8*(Sum mu_ll)
+void PrintVecBin(char *OutVec, double *EigVec, double *EigVal, int NScreen,int *TabScreen, int PosZero, double GroundState, uint32_t FinalSize);
+//OutBasis, binary eigenvector are also printed out into file having extension OutVec.
+//Files to write eigenvectors in binary format (FileVec)
 #endif

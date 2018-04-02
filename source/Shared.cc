@@ -44,6 +44,7 @@ Janet Hawkins Meal and S. R. Polo, The Journal of Chemical Physics 1956 24:6, 11
 #include "Shared.h"
 #include "Basic.h"
 #include <string.h>
+#include <sys/time.h>
 //
 void InitMode(ConfigId& M1,int Nmode)
 {

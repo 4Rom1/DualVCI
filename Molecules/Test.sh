@@ -97,6 +97,9 @@ cd ../H2O
 echo "############"
 echo "18th test : Water"
 echo "############"
+#Fail on Ground state.
+../../source/DVCI H2O_FailG.in
+#Simple fundamentals calculation.
 ../../source/DVCI H2O_Key.in
 wait
 echo "############"
@@ -114,3 +117,29 @@ wait #DVCI should be re-run before
 ../../source/DVCI H2O_Target.in
 wait
 ../../source/Transitions H2O_Target.in
+wait
+../../source/DVCI H2O_Fail1.in
+wait
+../../source/Transitions H2O_Fail1.in
+echo "############"
+echo "20th test : Water FinalVCI"
+echo "############"
+../../source/DVCI H2O_Fund.in
+wait
+../../source/FinalVCI H2O_Targ.in
+wait #DVCI should be re-run before
+../../source/DVCI H2O_AllIR2.in
+wait
+../../source/FinalVCI H2O_AllIR2.in
+wait #DVCI should be re-run before
+../../source/DVCI H2O_Target2.in
+wait
+../../source/FinalVCI H2O_Target2.in
+wait
+../../source/DVCI H2O_Fail2.in
+wait #Fail because not exit success for DVCI
+../../source/FinalVCI H2O_Fail2.in
+wait #No Rotational terms
+../../source/DVCI H2O_AllIRNoRot.in
+wait
+../../source/FinalVCI H2O_AllIRNoRot.in
