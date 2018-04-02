@@ -36,7 +36,7 @@
 //#include <omp.h> might be used in parallel version
 #include <limits.h>
 //
-#define IncK2 0
+#define IncK2 1
 //IncK2:Say if the the quadratic term should be included or not in the local force field,
 //also say if the harmonic energy should be added to diagonal elements (IncK2=0) or not (IncK2=1)
 int main(int argc, char *argv[])
@@ -378,7 +378,7 @@ double PrincEig[3]={0};
    {printf("\n *** Coordinates, masses and equilibrium geometry readed *** \n");}
 //
 //DoRot must be set up to zero anyway, because Coriolis not part of operator
-//DoRot=0;
+  DoRot=0;
   double *Omega=new double[NMode];//Omega is used as converter from Hartree to cm-1
 //
 uint8_t *Pid=NULL;//Degrees in each direction
