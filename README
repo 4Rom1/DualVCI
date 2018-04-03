@@ -86,12 +86,10 @@ Execution:
  The informations of the frequencies, residues, assignment and CPU time will
  be displayed in output. Additionally you'll see 2 other files with respective extension 
  -FinalBasis.in, -Vectors.bin (if Printout=1).
- The first one print all configurations of final basis set and non zero components 
- (in absolute value) of converged eigen-pairs.
- The second one is a binary file saving vectors components for post processing purpose
-  with the module Transitions.   
- It allows to get the transition moments <Psi_0 |Op|Psi_n> where
-  Op is an operator having the same format as the PES and Phi_s are targets previously
+ The first one print all configurations of final basis set and the second one 
+  the vectors components. 
+ Then the module Transitions allows to get the transition moments <Psi_0 |Op|Psi_n> where
+  Op is an operator having the same format as the PES and Phi_n are targets previously
   computed with DVCI (Psi_0 is the ground state).
  To run Transitions:
  $ Transitions INPUT-Op.in
