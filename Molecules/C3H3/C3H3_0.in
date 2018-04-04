@@ -1,0 +1,33 @@
+NMode 12                                
+PESType 0              
+OutName C3H3_F           
+PESName C3H3_PES0.in    
+Memory 820
+DoRot 1 
+EtaComp 2
+NAdd 80
+MaxEv 140 
+ThrCoor 0.65
+RefName C2H4_RefPyVCI.txt
+TargetState Fund
+MaxAdd 10000            /Limit number of basis function to add at each iteration
+Verbose 1
+KNRez 0.19
+KNNZ 0.014
+KNZREZ 0.13
+EpsRez 0.008
+Freq0Max 30000
+AddTarget 1
+Freq0Max 30000
+MAXNCV 180
+ThrPES 0.01
+AddTarget 1
+MaxQlevel 10
+ThrMat 1e-8
+DeltaNEV 10
+PrintOut 2
+
+|B|: 6688 , |Bs|: 2194196, 
+ NNZ(Hb) : 2370831 , NNZ(Hsb) : 32440142 
+
+NNZ too small
