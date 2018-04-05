@@ -27,7 +27,7 @@ FinalVCI: FinalVCI.o Graph.o ReadData.o Shared.o Assemblage.o Solver2.o Generato
 Graph.o: Graph.cc Graph.h Shared.o
 	$(CPP) $(CPP_FLAGS) -c Graph.cc -o Graph.o
 
-Generator.o: Generator.cc Shared.cc Generator.h Graph.cc 
+Generator.o: Generator.cc Generator.h Shared.o  Graph.o 
 	$(CPP) $(CPP_FLAGS) -c Generator.cc -o Generator.o
 
 ReadData.o: ReadData.h ReadData.cc Shared.o
