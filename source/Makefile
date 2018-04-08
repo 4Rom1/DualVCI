@@ -17,7 +17,7 @@ DVCI: DVCI.o Graph.o ReadData.o Shared.o Assemblage.o Solver2.o Generator.o
 Transitions: Transitions.o Graph.o ReadData.o Shared.o Assemblage.o Solver2.o Generator.o
 	$(CPP) $(CPP_FLAGS) -o Transitions Transitions.o \
 	Graph.o ReadData.o Shared.o Assemblage.o Solver2.o Generator.o $(ALL_LIBS);
-	echo "\n*****Transions compiled*****\n";
+	echo "\n*****Transitions compiled*****\n";
 
 FinalVCI: FinalVCI.o Graph.o ReadData.o Shared.o Assemblage.o Solver2.o Generator.o
 	$(CPP) $(CPP_FLAGS) -o FinalVCI FinalVCI.o \
