@@ -153,8 +153,8 @@ Source files
  ReadData.cc    -> Reading input and potential energy files.
  Basic.h        -> Basic subroutines.
  Transitions.cc -> Transitions <Phi_0 |Op|Phi_n> where
-                    Phi_n are targets previously computed with DVCI  
-
+                    Phi_n are targets previously computed with DVCI 
+ FinalVCI.cc    -> Re-run last iteration of DVCI when PrintOut=2 
 
 --------Additional sources-------------------
 
