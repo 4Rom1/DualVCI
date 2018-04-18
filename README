@@ -152,7 +152,7 @@ Source files
                     linear search and neighbors generator.
  ReadData.cc    -> Reading input and potential energy files.
  Basic.h        -> Basic subroutines.
- Transitions.cc -> Transitions |<Phi_0 |Op|Phi_n>|^2 where
+ Transitions.cc -> Transitions <Phi_0 |Op|Phi_n> where
                     Phi_n are targets previously computed with DVCI  
 
 
