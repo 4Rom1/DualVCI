@@ -1,7 +1,5 @@
 /*
     Dual Vibration Configuration Interaction (DVCI).
-    A novel factorisation of molecular Hamiltonian for
-    high performance infrared spectrum computation.
     Copyright (C) 2017  Romain Garnier
 
     This program is free software: you can redistribute it and/or modify
