@@ -99,7 +99,7 @@ NAdd 100
 MaxEv 12
 ThrCoor 0.4
 ThrKX 1e-15
-GroundState 12461.473
+/GroundState 12461.473
 RefName C2H4O_Ref.txt
 TargetState 0(1)
 TargetState 1(15)
@@ -143,7 +143,7 @@ Verbose 1
 EpsRez 0.0045
 Freq0Max 30000
 MaxAdd 30000
-KNREZ 0.15
+KNREZ 0.14
 KNNZ 0.024
 KNZREZ 0.25
 AddTarget 1
@@ -171,7 +171,7 @@ Freq0Max 30000
 MaxAdd 30000
 KNREZ 0.15
 KNNZ 0.024
-KNZREZ 0.25
+KNZREZ 0.24
 AddTarget 2
 @@@@@@@@@@@@@@@@@@@@@
 ---------------------
