@@ -1,7 +1,5 @@
 /* 
     Dual Vibration Configuration Interaction (DVCI).
-    A novel factorisation of molecular Hamiltonian for
-    high performance infrared spectrum computation.
     Copyright (C) 2018  Romain Garnier
 
     This program is free software: you can redistribute it and/or modify
@@ -57,16 +55,12 @@ http://stackoverflow.com/questions/25785863/how-to-set-a-variable-for-nested-loo
 #define MinSeqAss 30000
 //
 //Allocation for modes
+//""
 #define allocate_TabMode(Mode1,n)\
-ConfigId * Mode1=NULL;\
-Mode1 = new ConfigId [n];\
-for (uint32_t k = 0; k < n; k++)\
-{InitMode(Mode1[k], NMode);}
-// Free Mode
-#define FreeTabMode(Mode1,n)\
-for (uint32_t i = 0; i < n; i++)\
-{DeleteMode(Mode1[i]);}\
-delete [] Mode1;
+uint8_t * Mode1=NULL;\
+Mode1 = new uint8_t [n*NMode];\
+for (uint64_t k = 0; k < n*NMode; k++)\
+{Mode1[k]=0;}
 //
 void DeleteMode(ConfigId& M1);
 int nested_loop(uint8_t *ix, uint8_t *im, int depth);
@@ -77,7 +71,7 @@ int nested_loop(uint8_t *ix, uint8_t *im, int depth);
 int nested_loop1(uint8_t *ix, uint8_t *im, int depth);
 //Same as nested_loop but ix is initialized to one instead
 
-long LinearModeSearch(ConfigId *TabMode, uint8_t *ModeT, size_t SizeBit,  uint32_t SizeTab);
+long LinearModeSearch(uint8_t *TabMode, uint8_t *ModeT, size_t NMode,  uint32_t SizeTab);
 //Look if the multi-indexes ModeT is located in the array of multi-indexes TabMode.
 //Size of TabMode is SizeTab*SizeBit.
 //size_t SizeBit=NMode*sizeof(uint8_t)=NMode;
@@ -88,14 +82,14 @@ int LinearIntSearch(int *TabInt, int Key,  int SizeTab);
 long LinearU8Search(uint8_t MatU8[MaxTarget][MaxNormal], uint8_t *ModeKey, size_t SizeBit,  uint32_t SizeTab);
 //Search for the array ModeKey of size SizeBit in matrix MatU8.
 //
-long QsearchMode(uint8_t *key, ConfigId *base, uint32_t *Permuter, uint32_t size, int NMode);
+long QsearchMode(uint8_t *key, uint8_t *base, uint32_t *Permuter, uint32_t size, int NMode);
 //Binary search of configurations "Key" in basis "base" 
 //already sorted in the memcmp order given by the indexes of Permuter array
 //
-void QuickSortMode(ConfigId *MIndex,int left,int right, uint32_t *Permuter, int NMode);
+void QuickSortMode(uint8_t *MIndex,int left,int right, uint32_t *Permuter, int NMode);
 //Sort multi-indexes in MIndex according to memcmp order and return ascending order indexes in Permuter
 //
- int32_t partition (ConfigId *MIndex, uint32_t Permuter[], int left,int right, int NMode);
+ int32_t partition (uint8_t *MIndex, uint32_t Permuter[], int left,int right, int NMode);
 /*
 Permuter[rr] is the pivot element.
 All the smaller and bigger elements than the pivot are respectively 
@@ -107,7 +101,7 @@ int ConvertX(uint8_t *Tab, uint8_t *Surf,int NMode);
 //Convert the multi-index Tab of size NMode
 //on surface Surf={Positions({Tab[ii] # 0})}
 //
-uint32_t InitB0(ConfigId *ModeAct, KForce KFC,\
+uint32_t InitB0(uint8_t  *ModeAct, KForce KFC,\
    uint8_t *Pid, int NMode, uint32_t SizeActMax, double TargetMax);
 //Compute the initial subspace En<TargetMax, where En harmonic energy
 //and n are configuration arrays stored in ModeAct.
@@ -138,15 +132,15 @@ void AfficheNuTex(uint8_t *Mode, int NMode);
 //Print Modal components in Tex : dd*\nu{mm}+, ... for a normal coordinate mm and
 //a non null degree dd (corresponding to a degree of Hermite basis function)
 //
-void AfficheNuSupTex(ConfigId *ModeAct, double *EigVec, int NMode, uint32_t DimAct, double ThrCoor);
+void AfficheNuSupTex(uint8_t *ModeAct, double *EigVec, int NMode, uint32_t DimAct, double ThrCoor);
 //Print Modal components in Tex format and vector components bigger than ThrCoor
 //
-void AfficheNuSup(ConfigId *ModeAct, double *EigVec, int NMode, uint32_t DimAct, double ThrCoor);
+void AfficheNuSup(uint8_t *ModeAct, double *EigVec, int NMode, uint32_t DimAct, double ThrCoor);
 //Print Modal components and vector components bigger than ThrCoor 
 //
-void QuickSortModeShift (ConfigId *MIndex, int ll,int rr, uint32_t *Permuter, int NMode, uint64_t Shift);
+void QuickSortModeShift (uint8_t  *MIndex, int ll,int rr, uint32_t *Permuter, int NMode, uint64_t Shift);
 //
-int32_t PartShift (ConfigId *MIndex, uint32_t Permuter[], int ll, int rr, int NMode, uint64_t Shift);
+int32_t PartShift (uint8_t  *MIndex, uint32_t Permuter[], int ll, int rr, int NMode, uint64_t Shift);
 /*
 Permuter[rr]+Shift is the pivot element.
 All the smaller and bigger elements than the pivot are respectively 
@@ -155,29 +149,29 @@ There is an additional shift to avoid memory overflow of the residual indexes th
 Comparison of elements is done with memcmp c subroutine.
 */
 //
-long QsearchModeShift(uint8_t *Key, ConfigId *base, uint32_t *Permuter, uint32_t size, int NMode, uint64_t Shift);
+long QsearchModeShift(uint8_t *Key, uint8_t *base, uint32_t *Permuter, uint32_t size, int NMode, uint64_t Shift);
 //Same as previous subroutine : Binary search of configurations "Key" in basis "base" 
 //already sorted in the memcmp order given by the indexes of Permuter array.
 //But indexes are shifted by the number Shift in order to avoid troubles when they oversize MAXUINT32
 //Because Permuter is an array of UINT32_t
 //
 uint32_t CptLFFPerEx (int DegrePol, int NMode, int NPES, int DoCor, uint32_t NGenPoz,\
- KForce KFC, ConfigId *GenNeigh, int *NLFFPerEx, double **ZetaXYZ, double ThrPES, int IncK2);
+ KForce KFC, uint8_t *GenNeigh, int *NLFFPerEx, double **ZetaXYZ, double ThrPES, int IncK2);
 //Routine that counts the number of force constants per local force field.
 //The routine return the number of positive excitations in H*.
 //XPolSupPos contains the upper limit of positive excitations in H*.
-//XPolSupPos[xx].Degrees[mm] is defined for (xx,mm) in [0,NGenPoz[ x [0,NMode[.
+//XPolSupPos[Idm(xx)+mm] is defined for (xx,mm) in [0,NGenPoz[ x [0,NMode[.
 //IncK2:Say if the the quadratic term should be included or not in the local force field
 //
 uint32_t AssignLFFPerEx (int DegrePol, int NMode, int DoRot, int NPES, uint32_t NXDualHPlus,\
- KForce KFC, ConfigId *DualHPos, LocalFF *LFF, double **ZetaXYZ, double ThrKX, double ThrPES,\
+ KForce KFC, uint8_t *DualHPos, LocalFF LFF, double **ZetaXYZ, double ThrKX, double ThrPES,\
  uint32_t *Permuter, uint32_t *Corres, int IncK2);
 //Routine that copies indexes of positive excitations of most contributing Local Force Fields
 //into Corres.
 //Corres : Correspondance array giving the indexes of the first NXDualHTruncPos most contributive positive excitations of H*.
 //Select only the ones such that Sum|FC|>ThrKX
 //DualHPos contains positive excitations in H*.
-//DualHPos[xx].Degrees[mm] is defined for (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
+//DualHPos[Idm(xx)+mm] is defined for (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
 //IncK2:Say if the the quadratic term should be included or not in the local force field
 //
 #endif

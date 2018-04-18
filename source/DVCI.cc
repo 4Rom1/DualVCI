@@ -1,7 +1,5 @@
 /*
     Dual Vibration Configuration Interaction (DVCI).
-    A novel factorisation of molecular Hamiltonian for
-    high performance infrared spectrum computation.
     Copyright (C) 2018  Romain Garnier
 
     This program is free software: you can redistribute it and/or modify
@@ -23,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <string.h>
+#include <cstring>
 #include "Shared.h"
 #include <sys/time.h>
 #include "Graph.h"
@@ -35,6 +33,8 @@
 #include <cassert>
 //#include <omp.h> might be used in parallel version
 #include <limits.h>
+#include <vector>
+#include <float.h>
 //
 #define IncK2 0
 //IncK2:Say if the the quadratic term should be included or not in the local force field,
@@ -99,7 +99,7 @@ double EtaComp=1.5;//New basis set will be selected from the maximal component
 // of error vector divided by EtaComp*NNotConv, where NNotConv is the number of
 // non converged eigenvectors at a given iteration
 char OutName[MaxChar]="NoName";
-double ThrMat=1e-20; //Threshold for matrix elements
+double ThrMat=DBL_EPSILON; //Threshold for matrix elements
 double ThrCoor=0.6; //Threshold for component selection of targeted vectors
 int AddTarget=2; //Number of additional residual vectors to correct the potential increasing of targets
 int DegreEx[MaxCpld]={0};//Degree of excitation in each direction for the generator used here only to show values 
@@ -114,7 +114,7 @@ int PrintOut=0; //If >0 print final basis set and eigenvectors for post treatmen
 double EpsRez=6e-3; //Convergence criteria for global residue
 int Verbose=0;//If > 0 printout additional informations between iterations
 float ThrKX=1; //Threshold for contributions of sum force constants in dual operator
-double ThrPES=1e-20; //Threshold for derivative or force constants of the PES
+double ThrPES=DBL_EPSILON; //Threshold for derivative or force constants of the PES
 double Freq0Max=30000;//Frequency wall above groundState
 double KNNZ=0.03;// Shrinking factor for the NNZ of active matrix Hb
 double KNREZ=0.2;//Shrinking factor for residual space size
@@ -128,13 +128,14 @@ NNZRezMax=SizeActMax*(KNZREZ)*(NXDualHTrunc)
 */
 int DegreCoupl[MaxCpld]={0}; //Maxdegree of PES for each coupling: starts at 0 for coupling 1
 int DoGraph=1; // If not equal to zero, it will store the graph of residual matrix in CSC format
+int DoVPT=0;//If positif add correction vector and correction energy to targets
 //to gain computational time and then significantly increases memory requirement
 //
 printf("\n*****Reading Datas*****\n");
 //
 int NTargetStates=GetKeyWords(FileKey, &NMode, &DoRot, &MaxEv, &DeltaNev, &AddTarget,\
     &PESType, TargetState, &DoGraph, &MAXNCV,\
-    &MaxQLevel, &NAdd, &MaxAdd, &PrintOut, &EpsRez, &KNREZ, &KNNZ, &KNZREZ, &EtaComp,\
+    &MaxQLevel, &NAdd, &MaxAdd, &PrintOut, &DoVPT, &EpsRez, &KNREZ, &KNNZ, &KNZREZ, &EtaComp,\
      &Tol, &Kappa, &ThrMat, &ThrPES, &ThrCoor, &GroundState, &MinFreq, &MaxFreq, &Freq0Max, &ThrKX,\
     &Memory, &Verbose, OutName, PESName, RefName);
 //
@@ -160,7 +161,12 @@ printf("\n PES file name %s \n",PESName);
       MaxQLevel++; //Because < in Matrices
       printf("\n Maximal quantum level for each direction MaxQLevel = %d \n",MaxQLevel-1);
       if(ThrPES >0 && ThrMat>0)
-      {printf("\n Threshold for PES ThrPES = %e,\n Threshold for Hamiltonian matrix elements ThrMat = %e \n", ThrPES, ThrMat);}
+      {
+      //Cannot be under error machine.
+      ThrPES=Max<double>(DBL_EPSILON,ThrPES);
+      ThrMat=Max<double>(DBL_EPSILON,ThrMat);
+      printf("\n Threshold for PES ThrPES = %e,\n Threshold for Hamiltonian matrix elements ThrMat = %e \n", ThrPES, ThrMat);
+      }
       else{printf("\n Threshold for PES and for Hamiltonian matrix elements have to be > 0 \n");FinalMessaj() return 0;}
 //
       if(NTargetStates)
@@ -190,6 +196,11 @@ per non converged eigenpairs at each iteration, bounded by %d \n",NAdd,MaxAdd);
        {
        printf("\nDoGraph non null means storage of residual graph: more memory, less cpu time\n");
        }
+       if(DoVPT)
+       {
+       printf("\nDoVPT non null VPT correction will be added to energies at final stage\n");
+       }
+
 //
        printf("\nShrinking factor for residual space KNREZ = %.1f,\n\
  and shrinking factor for the maximal number of indexes in the residual graph KNZREZ =  %.1f\n", KNREZ, KNZREZ);
@@ -399,14 +410,7 @@ for (int mm=0; mm<  NMode ; mm ++)
     {printf("\\\\\n");}
   }
   printf("\n");
-//
-printf("Quantum levels by coordinate\n");
-printf("[");
-for (int mm=0; mm<  NMode-1; mm ++) 
-  { 
-       printf("%u, ",Pid[mm]-1);  
-  }
-printf("%u]\n",Pid[NMode-1]-1);
+
 //
  double KFMax=AdjustCoeff(KijNCpld, KijCpld,DegrePol, NPES, PESType, Monm, NMode);
 //   
@@ -431,6 +435,24 @@ printf("%u]\n",Pid[NMode-1]-1);
        FreeMat(Monm,NPES)  
        FreeTab(KijCpld)
        FreeMat(KijNCpld,DegrePol) 
+//
+printf("\n***Quantum levels by coordinate***\n");
+printf("[");
+for (int mm=0; mm<  NMode-1; mm ++) 
+  { 
+       printf("%u, ",Pid[mm]-1);  
+  }
+printf("%u]\n",Pid[NMode-1]-1);
+//
+printf("\n***Pruning condition***\n");
+printf("Sum ");
+double FreqMin=MinimumVal(KFC.KijNCpld[1],NMode);
+for (int mm=0; mm<  NMode-1; mm ++) 
+  { 
+       printf("%ib_{%i} + ",(int)round(KFC.KijNCpld[1][mm]/FreqMin),mm+1);  
+  }
+printf("%ib_{%i} <= %i\n",(int)round(KFC.KijNCpld[1][NMode-1]/FreqMin),NMode,(int)round(Freq0Max/FreqMin));
+//
 //
 double Ull=0;//Watson term
 if(DoRot)
@@ -497,7 +519,7 @@ if(DoRot)
      printf("Maximal degree for %d-mode couplings = %d\n",nn,DegreCoupl[nn-1]); 
      }     
     }
-   //Allocation for generator XPolSupPos[xx].Degrees[mm], (xx,mm) in [0,NGenPoz[ x [0,NMode[
+   //Allocation for generator XPolSupPos[Idm(xx)+mm], (xx,mm) in [0,NGenPoz[ x [0,NMode[
     allocate_TabMode(XPolSupPos,NGenPoz) //Set of upper limit of positive excitations in H*
     uint32_t SizeGenOld=GeneratorTotPoz (NMode, XPolSupPos, DegreCoupl, NCPol);
       if(NGenPoz != SizeGenOld)
@@ -522,7 +544,8 @@ if(!NLFFPerEx[0]){NXDualHPlus++;}//If zero excitation not included
  { 
  if(NLFFPerEx[ll])
   {
-   DegreEx[CmptNNULL(XPolSupPos[ll].Degrees, NMode)]++;     
+//""DegreEx[CmptNNULL(XPolSupPos[ll].Degrees, NMode)]++;   
+    DegreEx[CmptNNULL(&XPolSupPos[Idm(ll)],NMode)]++;
   }
  } 
     if(Verbose)
@@ -537,18 +560,22 @@ if(!NLFFPerEx[0]){NXDualHPlus++;}//If zero excitation not included
      } 
 //
  allocate_TabMode(DualHPos,NXDualHPlus)  
-//DualHPos[xx].Degrees[mm], (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
+//""DualHPos[Idm(xx)+mm], (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
 //    
- LocalFF *LFF=NULL;
- LFF=new LocalFF[NXDualHPlus];
+ LocalFF LFF;
+ LFF.Num=NULL;
+ LFF.Num=new uint32_t[NXDualHPlus+1];
 //
-/*LFF[xx] : local force field associated with positive excitation DualHPos[xx].
-LFF[xx].Idx[ii] < 0 are indexes of non coupled force constants:
+/*LFF[ii(xx)] : local force field associated with positive excitation &DualHPos[Idm(xx)].
+LFF.Idx[ii(xx)] are defined for ii [LFF.Num[xx],LFF.Num[xx+1][
+LFF.Idx[ii(xx)] < 0 are indexes of non coupled force constants:
 KFC.KijNCpld[dd][mm] with dd=-LFF.Idx[ii]/NMode, mm=-LFF.Idx[ii]-dd*NMode;
-0 <= LFF[xx].Idx[ii] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF[xx].Idx[ii]].
+0 <= LFF.Idx[ii(xx)] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF.Idx[ii(xx)]].
 LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
 with a unique corresponding (ni,nj,nk,nl)  
-LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[*/
+LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
+with a unique corresponding (ni,nj,nk,nl) 
+*/
 //
    NXDualHPlus=0;
    uint32_t TotalLFF=0;//Total number of force constants per excitation in dual operator
@@ -558,26 +585,41 @@ LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[*/
    if(!NLFFPerEx[0])
    {
    printf("*******No zero excitation**********\n");
-   CopyTab(DualHPos[NXDualHPlus].Degrees,XPolSupPos[0].Degrees,NMode)
+//""
+   memcpy(&DualHPos[Idm(NXDualHPlus)],&XPolSupPos[0],(size_t)NMode);
+   LFF.Num[NXDualHPlus]=0;
    NXDualHPlus++;
+   TotalLFF++;
    }   
 //   
 int MaxTerm=0;
-//
  for (uint32_t ll=0; ll<NGenPoz; ll++)
  { 
  if(NLFFPerEx[ll])
   {
+//""
+   memcpy(&DualHPos[Idm(NXDualHPlus)],&XPolSupPos[Idm(ll)],(size_t)NMode);
+//""
+//LFF.Idx[ii(xx)] are defined for ii [LFF.Num[xx],LFF.Num[xx+1][ then
+   LFF.Num[NXDualHPlus]=TotalLFF;
+   NXDualHPlus++;
+   TotalLFF+=NLFFPerEx[ll];
+/*
    CopyTab(DualHPos[NXDualHPlus].Degrees,XPolSupPos[ll].Degrees,NMode) 
    InitLFF(LFF[NXDualHPlus],NLFFPerEx[ll]);
    NXDualHPlus++;
    TotalLFF+=NLFFPerEx[ll];
+*/
    if(NLFFPerEx[ll]>MaxTerm && ll)
     {
     MaxTerm=NLFFPerEx[ll];
     }
    }
   }
+//""/Add last term
+   LFF.Num[NXDualHPlus]=TotalLFF;
+   LFF.Idx=new int32_t[TotalLFF];
+//
  int AvgTerm=TotalLFF/NXDualHPlus;
 //Evaluated number of operation per matrix element
  uint32_t AvgOp=(uint32_t)log((double)(NXDualHPlus))*(double)NMode+AvgTerm*NMode;
@@ -615,7 +657,8 @@ uint32_t NXDualHTrunc=GetNXDualHTrunc(DualHPos,NXDualHTruncPos,Corres, NMode);
  }
 //
    delete [] NLFFPerEx;
-   FreeTabMode(XPolSupPos,NGenPoz) 
+//""
+   delete [] XPolSupPos; 
 //  
 /*
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -666,7 +709,14 @@ uint32_t SizeInit;//Intial subspace size
        printf("\n***GroundState value must be specified for window target when MinFreq>0***\n\n");
        FinalMessaj()
        return 0;
-      }      
+      } 
+      if ((MinFreq>0) && (GroundState <=0)) 
+      {
+       printf("\n***GroundState value must be specified for window target when MinFreq>0***\n\n");
+       FinalMessaj()
+       return 0;
+      } 
+     
 //
      if(NTargetStates)
     {
@@ -707,7 +757,8 @@ uint32_t SizeInit;//Intial subspace size
          }         
 //Initial subspace construction    
      allocate_TabMode(ModeAct,SizeActMax)
-//ModeAct : Multi-dimensional array for active space B : ModeAct[nn].Degrees[mm], (nn,ii) in [0,SizeActMax[ x [0,NMode[.
+//ModeAct : Multi-dimensional array for active space B : ModeAct[Idm(nn)+mm], (nn,ii) in [0,SizeActMax[ x [0,NMode[.
+//Changed to ModeAct[Idm(nn)+mm]
      double TargetFreq=Kappa*MaxFreq; // Target frequency for initial subspace construction.
 //
      printf("\nMaximal energy for initial subspace construction\n %f cm-1 = kappa*(MaxFreq) \n", TargetFreq);        
@@ -759,7 +810,7 @@ if(NTargetStates)
  if(detect>=0)
       {
  PositionTarget[tt]=detect;
- // AfficheNu(ModeAct[detect].Degrees, NMode)
+ //'' AfficheNu(&ModeAct[Idm(detect)], NMode)
   if(Verbose)
        {
        AfficheNu(TargetState[tt], NMode);
@@ -829,7 +880,8 @@ for (int jj=0;jj<NTargetStates;jj++)
     printf("\nMaximal NNZ for matrix Hb,\n NNZActMax (=SizeActMax*(KNNZ)*(NXDualHTrunc)) : %lu \n",NNZActMax);
     printf("Maximal indexes in graph of residual matrix Hsb,\n NNZRezMax (= SizeActMax*(KNZREZ)*(NXDualHTrunc)) : %lu \n\n",NNZRezMax);
 //
-//ModeRez : Multi-dimensional array for residual space : ModeRez[nn].Degrees[mm], (nn,mm) in [0,SizeRezMax[ x [0,NMode[. 
+//ModeRez : Multi-dimensional array for residual space : ModeRez[Idm(nn)+mm], (nn,mm) in [0,SizeRezMax[ x [0,NMode[. 
+//Changed to ModeRez[Idm(nn)+mm]
     allocate_TabMode(ModeRez,SizeRezMax)   
 //
 // Allocation and intialisation of the array and configurations    
@@ -954,7 +1006,8 @@ EigValOld=new double[NEV];
    { EigValOld[nn]=0;
      for (int mm = 0 ; mm < NMode; mm++)
     {
-    EigValOld[nn]=EigValOld[nn]+(ModeAct[nn].Degrees[mm]+0.5)*KFC.KijNCpld[1][mm];
+//""EigValOld[nn]=EigValOld[nn]+(ModeAct[Idm(nn)+mm]+0.5)*KFC.KijNCpld[1][mm];
+    EigValOld[nn]=EigValOld[nn]+(ModeAct[Idm(nn)+mm]+0.5)*KFC.KijNCpld[1][mm];
     } 
    }
    SortAsc2<double>(EigValOld, NEV);
@@ -1257,7 +1310,6 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
           {
          MaxAddVar=0;
           }        
-  
           if(MaxAddVar)
           {
    gettimeofday(&begin,NULL);
@@ -1283,7 +1335,8 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
           {//Add elements for next iteration and increment Size[Iteration+2].DimAct
            if (Size[Iteration+2].DimAct < SizeActMax)
              {
-          memcpy(&ModeAct[Size[Iteration+2].DimAct].Degrees[0],&ModeRez[AssignRez[aa]].Degrees[0],SizeBit);
+//""
+          memcpy(&ModeAct[Idm(Size[Iteration+2].DimAct)], &ModeRez[Idm(AssignRez[aa])],SizeBit);         
           Size[Iteration+2].DimAct++;
              }
            }
@@ -1321,12 +1374,42 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
     printf("Total CPU wall time: ");
     ConvertTimeS(CPUTime);
 //
+//VPT correction energies
+double *VPTE=NULL;
+//
 if(ExitSuccess)
  {
+ 
+ if(DoVPT)
+  {
+     VPTE=new double[NScreen];
+//
+     gettimeofday(&begin,NULL);
+//
+     InitTabInt(VPTE,NScreen)
+     VPT2Energy(RezVect,Size[Iteration+1].DimRez, EigVal, ModeRez, NScreen, NPES,\
+     DegrePol,NMode, TabScreen, QQ, SizeMax, LFF, ZetaXYZ, Omega, VPTE,KFC);
+//
+     gettimeofday(&end,NULL);
+//    
+     time_spent=TIME_DIFFS(begin, end); 
+//Define the maximum size of active space B and residual space
+     printf("\n**Total time for energy correction evaluation %u s**\n",time_spent);
+  }   
+
       double TabRef[MaxRef]={0}; //Array to store the reference values
           if(FileRef!=NULL)
           {
                 printf("\n %d lines detected in Reference file\n",GetValRef(FileRef, TabRef));
+          }
+          if(DoVPT)
+          { 
+                printf("\n Assignment  | Frequency | Relativ |  Correction | Error  || \n");
+                printf(" (Component) | (number)  | Residue |   Energy   | Ref-Here || \n");
+                printf("------------------------------------ \n");              
+          }
+          else
+          { 
                 printf("\n Assignment  | Frequency | Relativ | Error  || \n");
                 printf(" (Component) | (number)  | Residue | Ref-Here || \n");
                 printf("------------------------------------ \n");              
@@ -1337,9 +1420,7 @@ if(ExitSuccess)
      {   
     DetectZero=0; //If >0 the groundstate has been detected
     detect=1; //If it remains positive one of the Target has been detected 
-    PosZero=-1; //Position of groundstate if detected (might be not equal to zero)           
-        if(FileRef!=NULL)
-        {   
+    PosZero=-1; //Position of groundstate if detected (might be not equal to zero)             
         if(GroundState<=0)
         {
         DetectZero=DetectMaxCoordinate(&EigVec[PosEig*Size[Iteration+1].DimAct], PositionTarget, 1,ThrCoor);
@@ -1348,6 +1429,11 @@ if(ExitSuccess)
          PosZero=PosEig; 
          SaveZero=PosEig;      
          Ground=EigVal[PosEig];
+/*
+         if(DoVPT)
+          {
+            Ground=EigVal[PosEig]+VPTE[ss];
+          }*/
          } 
         }
         if(NTargetStates && !DetectZero)
@@ -1356,35 +1442,59 @@ if(ExitSuccess)
           { 
            //Assignment display
            AfficheNuSupTex(ModeAct, &EigVec[PosEig*Size[Iteration+1].DimAct], NMode, Size[Iteration+1].DimAct, ThrCoor);
-//                  
+           //""                  
            if(PosEig==PosZero)
            {
-           if(!DoRot)
+           if(DoVPT)
             {
+           if(!DoRot)
+             {
+            printf(" | %.2f(%d) | %.4f | %.4f  | %.4f  |  // \n \n", \
+            Ground,PosEig,RezRel[ss],VPTE[ss],GetClosest(TabRef,Ground)-(Ground));
+             }
+           else//Add Watson
+             {
+           printf(" | %.2f(%d) (mu : %.2f) | %.4f | %.4f | %.4f  // \n \n", \
+           Ground,PosEig,Ull,RezRel[ss],VPTE[ss],GetClosest(TabRef,Ground)-(Ground));//Add watson
+             }
+            }
+          else
+           {
+           if(!DoRot)
+             {
             printf(" | %.2f(%d) | %.4f | %.4f // \n \n", \
             Ground,PosEig,RezRel[ss],GetClosest(TabRef,Ground)-(Ground));
-            }
+             }
            else//Add Watson
-            {
-           printf(" | %.2f(%d) | %.4f | %.4f  || %.4f (Watson term) // \n \n", \
-           Ground,PosEig,RezRel[ss],GetClosest(TabRef,Ground)-(Ground),Ull);//Add watson
+             {
+           printf(" | %.2f(%d) (mu : %.2f) | %.4f | %.4f  // \n \n", \
+           Ground,PosEig,Ull,RezRel[ss],GetClosest(TabRef,Ground)-(Ground));//Add watson
+             }
             }
 //
            }
            else
            {
+           if(DoVPT)
+            {
+//           EigVal[PosEig]+=VPTE[ss];
+           printf(" | %.2f(%d) | %.4f | %.4f | %.4f // \n \n", \
+           EigVal[PosEig]-Ground,PosEig,RezRel[ss],VPTE[ss],GetClosest(TabRef,EigVal[PosEig]-Ground)-(EigVal[PosEig]-Ground));         
+            }
+           else
+            {
            printf(" | %.2f(%d) | %.4f | %.4f // \n \n", \
            EigVal[PosEig]-Ground,PosEig,RezRel[ss],GetClosest(TabRef,EigVal[PosEig]-Ground)-(EigVal[PosEig]-Ground));
+            }
            }         
            ss++;                                                                                                          
            }
           }
-        }
 //
 if(PrintOut==1)//Print final basis set in FileBasis
  {
 PrintConfsBin(OutBasis,ModeAct, NMode, NScreen, Size[Iteration+1].DimAct);
-//
+//""
 PrintVecBin(OutVec, EigVec, EigVal, NScreen,TabScreen, SaveZero, GroundState, Size[Iteration+1].DimAct);
  }
 if(PrintOut>1)//Matrix in binary
@@ -1393,7 +1503,7 @@ if(PrintOut>1)//Matrix in binary
  PrintConfsBin(OutBasis,ModeAct, NMode, NScreen, Size[Iteration+1].DimAct);
  }
 }//If exitsuccess
-else if(!ExitSuccess && PrintOut)////Indicate non success with null value into binarry files
+else if(!ExitSuccess && PrintOut)//""Indicate non success with null value into binarry files
 {
 FILE *FileMat=fopen(OutMat,"wb");
 FILE *FileBasis=fopen(OutBasis,"wb");
@@ -1410,11 +1520,18 @@ fclose(FileBasis);
 //
     if(FileRef!=NULL){fclose(FileRef);}
 //
-     FreeTabMode(ModeAct,SizeActMax)
-//  
-     FreeTabMode(DualHPos,NXDualHPlus) 
+    if(DoVPT){delete [] VPTE;}
 //
-     FreeTabMode(ModeRez,SizeRezMax)  
+//""FreeTabMode(ModeAct,SizeActMax)
+
+  delete [] ModeAct;
+  delete [] ModeRez;
+  delete [] DualHPos;
+
+//  
+//""FreeTabMode(DualHPos,NXDualHPlus) 
+//
+//""FreeTabMode(ModeRez,SizeRezMax)  
 //
      FreeMat(ZetaXYZ, ((NMode+1)*NMode)/2)
 //  
@@ -1428,8 +1545,8 @@ fclose(FileBasis);
 //  
      FreeCSC(IJAct)
      FreeCSC(IJRez)
-//
-     FreeLFF(LFF,NXDualHPlus)
+//""
+     FreeLFF(LFF)
 //
      delete [] Size;
      delete [] RezRel;

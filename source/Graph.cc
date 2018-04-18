@@ -1,7 +1,5 @@
 /*
     Dual Vibration Configuration Interaction (DVCI).
-    A novel factorisation of molecular Hamiltonian for
-    high performance infrared spectrum computation. 
     Copyright (C) 2017  Romain Garnier
 
     This program is free software: you can redistribute it and/or modify
@@ -84,41 +82,39 @@ int nested_loop1(uint8_t *ix, uint8_t *im, int depth)
     return 0;
 }
 //
-void DeleteMode(ConfigId& M1)
-{  
-  delete[] M1.Degrees; 
-}
 //
-long LinearModeSearch(ConfigId *TabMode, uint8_t *ModeT, size_t SizeBit,  uint32_t SizeTab)
+long LinearModeSearch(uint8_t *TabMode, uint8_t *ModeT, size_t NMode,  uint32_t SizeTab)
 {
 //Look if the multi-indexes ModeT is located in the array of multi-indexes TabMode.
 //Size of TabMode is SizeTab*SizeBit.
 //Don't forget the case where the size of array is zero.
 //size_t SizeBit=NMode*sizeof(uint8_t)=NMode;
- {
    uint32_t Cmpt=0;
  //memcmp return 0 if the configurations are identical else it returns a non nul value.
-  while(memcmp(TabMode[Cmpt].Degrees, ModeT, SizeBit))
+//''
+ while(memcmp(&TabMode[Idm(Cmpt)], ModeT, NMode))
     {   
+//"" 
+//Need to add NMode to parameters
      Cmpt++;
      if(Cmpt >= SizeTab)
       {return -1;} 
     }
     return Cmpt;
- }
 //
 }
 //
-  long QsearchMode(uint8_t *Key, ConfigId *base, uint32_t *Permuter, uint32_t size, int NMode)
+  long QsearchMode(uint8_t *Key, uint8_t *base, uint32_t *Permuter, uint32_t size, int NMode)
   {
 //Binary search of configurations "Key" in basis "base" 
 //already sorted in the memcmp order given by the indexes of Permuter array
           uint32_t debut = 0, fin = size-1;
           uint32_t milieu=0;
           int Cmp=0;  
-          int Cmp0=memcmp(Key, base[Permuter[debut]].Degrees, NMode);
-          int Cmp1=memcmp(Key, base[Permuter[fin]].Degrees, NMode);
-//          
+//""
+          int Cmp0=memcmp(Key, &base[Idm(Permuter[debut])], NMode);
+          int Cmp1=memcmp(Key, &base[Idm(Permuter[fin])], NMode);
+//         
           if(Cmp0<0 || Cmp1 >0)
              {return -1;}   
           else if (!Cmp0)
@@ -129,7 +125,7 @@ long LinearModeSearch(ConfigId *TabMode, uint8_t *ModeT, size_t SizeBit,  uint32
           while (debut < fin) 
            {
                   milieu = debut + (fin - debut) / 2;  
-                  Cmp = memcmp(Key, base[Permuter[milieu]].Degrees, NMode);
+                    Cmp = memcmp(Key, &base[Idm(Permuter[milieu])], NMode);
                   if (Cmp < 0)
                        {
                           fin = milieu;
@@ -147,7 +143,7 @@ long LinearModeSearch(ConfigId *TabMode, uint8_t *ModeT, size_t SizeBit,  uint32
           return -1;
   }
 //
- long QsearchModeShift(uint8_t *Key, ConfigId *base, uint32_t *Permuter, uint32_t size, int NMode, uint64_t Shift)
+ long QsearchModeShift(uint8_t *Key, uint8_t *base, uint32_t *Permuter, uint32_t size, int NMode, uint64_t Shift)
   {
 //Same as previous subroutine : Binary search of configurations "Key" in basis "base" 
 //already sorted in the memcmp order given by the indexes of Permuter array.
@@ -155,10 +151,12 @@ long LinearModeSearch(ConfigId *TabMode, uint8_t *ModeT, size_t SizeBit,  uint32
 //Because Permuter is an array of UINT32_t
           uint32_t debut = 0, fin = size-1;
           uint32_t milieu=0;
-          int Cmp=0;  
-          int Cmp0=memcmp(Key, base[Permuter[debut]+Shift].Degrees, NMode);
-          int Cmp1=memcmp(Key, base[Permuter[fin]+Shift].Degrees, NMode);
-          
+          int Cmp=0;     
+//""
+          int Cmp0=memcmp(Key, base+Idm(Permuter[debut]+Shift), NMode);
+          int Cmp1=memcmp(Key, base+Idm(Permuter[fin]+Shift), NMode);
+//
+//    
           if(Cmp0<0 || Cmp1 >0)
              {return -1;}   
           else if (!Cmp0)
@@ -169,7 +167,8 @@ long LinearModeSearch(ConfigId *TabMode, uint8_t *ModeT, size_t SizeBit,  uint32
           while (debut < fin) 
            {
                   milieu = debut + (fin - debut) / 2;  
-                  Cmp = memcmp(Key, base[Permuter[milieu]+Shift].Degrees, NMode);
+//""
+                  Cmp = memcmp(Key, base+Idm(Permuter[milieu]+Shift), NMode);
                   if (Cmp < 0)
                        {
                           fin = milieu;
@@ -186,7 +185,7 @@ long LinearModeSearch(ConfigId *TabMode, uint8_t *ModeT, size_t SizeBit,  uint32
           return -1;
   }
 //
-int32_t partition (ConfigId *arr, uint32_t Permuter[], int ll, int rr, int NMode)
+int32_t partition (uint8_t *arr, uint32_t Permuter[], int ll, int rr, int NMode)
 {
 /*
 Permuter[rr] is the pivot element.
@@ -198,7 +197,8 @@ Comparison of elements is done with memcmp c subroutine.
  
     for (int32_t jj = ll; jj <= rr- 1; jj++)
     {
-        if(memcmp(arr[Permuter[jj]].Degrees, arr[Permuter[rr]].Degrees, NMode)<=0)
+//""    
+        if(memcmp(&arr[Idm(Permuter[jj])],&arr[Idm(Permuter[rr])], NMode)<=0) 
         {
             ii++;
             swap (&Permuter[ii], &Permuter[jj]);
@@ -208,7 +208,7 @@ Comparison of elements is done with memcmp c subroutine.
     return (ii + 1);
 }
 //
-int32_t PartShift (ConfigId *arr, uint32_t Permuter[], int ll, int rr, int NMode, uint64_t Shift)
+int32_t PartShift (uint8_t *arr, uint32_t Permuter[], int ll, int rr, int NMode, uint64_t Shift)
 {
 /*
 Permuter[rr]+Shift is the pivot element.
@@ -221,8 +221,10 @@ Comparison of elements is done with memcmp c subroutine.
  
     for (int32_t jj = ll; jj <= rr- 1; jj++)
     {
-        if(memcmp(arr[Permuter[jj]+Shift].Degrees, arr[Permuter[rr]+Shift].Degrees, NMode)<=0)
+//      
+        if(memcmp(&arr[Idm(Permuter[jj]+Shift)],&arr[Idm(Permuter[rr]+Shift)], NMode)<=0) 
         {
+//""
             ii++;
             swap (&Permuter[ii], &Permuter[jj]);
         }
@@ -231,7 +233,7 @@ Comparison of elements is done with memcmp c subroutine.
     return (ii + 1);
 }
 //
-void QuickSortMode (ConfigId *MIndex, int lo,int hi, unsigned int *Permuter, int NMode)
+void QuickSortMode (uint8_t *MIndex, int lo,int hi, unsigned int *Permuter, int NMode)
 {
 //Sort multi-indexes in MIndex according to memcmp order and return ascending order indexes in Permuter
   if (lo < hi)
@@ -244,7 +246,7 @@ void QuickSortMode (ConfigId *MIndex, int lo,int hi, unsigned int *Permuter, int
     }
 }
 //
-void QuickSortModeShift (ConfigId *MIndex, int lo,int hi, uint32_t *Permuter, int NMode, uint64_t Shift)
+void QuickSortModeShift (uint8_t *MIndex, int lo,int hi, uint32_t *Permuter, int NMode, uint64_t Shift)
 {
 //Sort multi-indexes in &MIndex[+Shift] according to memcmp order and return ascending order indexes in Permuter
   if (lo < hi)
@@ -257,7 +259,7 @@ void QuickSortModeShift (ConfigId *MIndex, int lo,int hi, uint32_t *Permuter, in
     }
 }
 //
-uint32_t InitB0(ConfigId *ModeAct, KForce KFC,\
+uint32_t InitB0(uint8_t  *ModeAct, KForce KFC,\
    uint8_t *Pid, int NMode, uint32_t SizeActMax, double TargetMax)
 {
 //Compute the initial subspace En<TargetMax, where En harmonic energy
@@ -270,7 +272,7 @@ uint32_t InitB0(ConfigId *ModeAct, KForce KFC,\
 //KFC. KijNCpld[dd][mm] : non coupled force constants, defined for (dd,mm) in [0,DegrePol[x[0,NMode[ (degree dd+1, mode mm<NMode).
 //KFC.KijCpld[kk] : coupled force constants, defined for kk in [0,NPES[.
 //KFC.Monm[kk][mm] = degree of monomial kk for coordinate mm in PES.
-//ModeAct : Multi-dimensional array for active space B : ModeAct[nn].Degrees[mm], (nn,mm) in [0,SizeActMax[ x [0,NMode[.
+//ModeAct : Multi-dimensional array for active space B : ModeAct[Idm(nn)+mm], (nn,mm) in [0,SizeActMax[ x [0,NMode[.
 uint32_t Lin=0;
 uint8_t *Tester=NULL; //Variable multi index during the loop
 //Size of bytes to look for in linearsearch arrays 
@@ -299,20 +301,25 @@ SizeAv=SizeInit;
 //
 for (Lin=SizeAvAv ; Lin < SizeAv ; Lin++)
  {
-Freq0=GetFreq0(ModeAct[Lin].Degrees,NMode, KFC);
+//""
+ Freq0=GetFreq0(&ModeAct[Idm(Lin)],NMode, KFC);
 //One modal excitations
 Cpld=1;
 //
  for (int mm=0; mm< NMode; mm++)
   {
 //  
-  memcpy(Tester,ModeAct[Lin].Degrees, SizeBit);
+//""
+    memcpy(Tester,&ModeAct[Idm(Lin)], SizeBit);
+//
 //             
     ss=0;
     go=1;
    while ( (ss<Cpld) && go )
     {
-    TestNeg=DegInc+ModeAct[Lin].Degrees[mm];
+//""
+//ModeAct[Idm(Lin)+mm]
+    TestNeg=DegInc+ModeAct[Idm(Lin)+mm];
     if(TestNeg >= Pid[mm]){go=0;}
     else
      {
@@ -338,11 +345,13 @@ if(Freq0T<=TargetMax)
 //Tester non equal zero no problem either because not in previous checking.
 //Checking can be done starting from previous layer because before the gap
 //will be bigger than 1 degree difference
-  CheckIn=LinearModeSearch(&ModeAct[SizeAvAv], Tester, SizeBit,SizeInit-SizeAvAv+1);  
+//''
+  CheckIn=LinearModeSearch(&ModeAct[Idm(SizeAvAv)], Tester, SizeBit,SizeInit-SizeAvAv+1);  
 //
     if(CheckIn<0)
         {
-        memcpy(ModeAct[SizeInit].Degrees,Tester,SizeBit);
+//""
+    memcpy(&ModeAct[Idm(SizeInit)],Tester,SizeBit); 
         SizeInit++;
         }
        }  
@@ -520,7 +529,7 @@ printf("+\\nu_{%d}",mm+1);}}\
 if(!CmptMode){printf("\\nu_{0}");}
 }
 //
-void AfficheNuSupTex(ConfigId *ModeAct, double *EigVec, int NMode, uint32_t DimAct, double ThrCoor)
+void AfficheNuSupTex(uint8_t  *ModeAct, double *EigVec, int NMode, uint32_t DimAct, double ThrCoor)
 {//Print Modal components in Tex format and vector components bigger than ThrCoor
      int Cpt=0;
      double Val;
@@ -531,7 +540,8 @@ void AfficheNuSupTex(ConfigId *ModeAct, double *EigVec, int NMode, uint32_t DimA
             {
            printf(", ");
            printf("$");
-           AfficheNuTex(ModeAct[ii].Degrees, NMode); 
+//""
+     AfficheNuTex(&ModeAct[Idm(ii)], NMode); 
            printf("$");
            printf("(%.2f)",Val);
            Cpt++; 
@@ -539,7 +549,8 @@ void AfficheNuSupTex(ConfigId *ModeAct, double *EigVec, int NMode, uint32_t DimA
             else if(Val>ThrCoor && !Cpt)
             {
            printf("$");
-           AfficheNuTex(ModeAct[ii].Degrees, NMode); 
+//""
+     AfficheNuTex(&ModeAct[Idm(ii)], NMode); 
            printf("$");
            printf("(%.2f)",Val);
            Cpt++;
@@ -547,7 +558,7 @@ void AfficheNuSupTex(ConfigId *ModeAct, double *EigVec, int NMode, uint32_t DimA
           }
 }
 //
-void AfficheNuSup(ConfigId *ModeAct, double *EigVec, int NMode, uint32_t DimAct, double ThrCoor)
+void AfficheNuSup(uint8_t  *ModeAct, double *EigVec, int NMode, uint32_t DimAct, double ThrCoor)
 {
 //Print Modal components and vector components bigger than ThrCoor 
      int Cpt=0;
@@ -558,13 +569,15 @@ void AfficheNuSup(ConfigId *ModeAct, double *EigVec, int NMode, uint32_t DimAct,
             if(Val>ThrCoor && Cpt)
             {
            printf(", ");
-           AfficheNu(ModeAct[nn].Degrees, NMode); 
+//""
+         AfficheNu(&ModeAct[Idm(nn)], NMode); 
            printf("(%.2f)",Val);
            Cpt++; 
             }
             else if(Val>ThrCoor && !Cpt)
             {
-           AfficheNu(ModeAct[nn].Degrees, NMode); 
+//"" 
+         AfficheNu(&ModeAct[Idm(nn)], NMode); 
            printf("(%.2f)",Val);
            Cpt++;
             }
@@ -572,24 +585,24 @@ void AfficheNuSup(ConfigId *ModeAct, double *EigVec, int NMode, uint32_t DimAct,
 }
 //
 uint32_t CptLFFPerEx (int DegrePol, int NMode, int NPES, int DoRot, uint32_t NGenPoz,\
- KForce KFC, ConfigId *XPolSupPos, int *NLFFPerEx, double **ZetaXYZ, double ThrPES, int IncK2)
+ KForce KFC, uint8_t *XPolSupPos, int *NLFFPerEx, double **ZetaXYZ, double ThrPES, int IncK2)
 {
 //Routine that counts the number of force constants per local force field.
 //The routine return the number of positive excitations in H*.
 //XPolSupPos contains the upper limit of positive excitations in H*.
-//XPolSupPos[xx].Degrees[mm] is defined for (xx,mm) in [0,NGenPoz[ x [0,NMode[.
+//XPolSupPos[Idm(xx)+mm] is defined for (xx,mm) in [0,NGenPoz[ x [0,NMode[.
 //Force constants:
 //KFC.KijNCpld[dd][mm] : non coupled force constants, defined for (dd,mm) in [0,DegrePol[x[0,NMode[ (degree dd+1, mode mm<NMode).
 //KFC.KijCpld[kk] : coupled force constants, defined for kk in [0,NPES[.
 //KFC.Monm[kk][mm] = degree of monomial kk for coordinate mm in PES.
 //Local force field:
-//LFF[xx] : local force field associated with positive excitation DualHPos[xx].
-//LFF[xx].Idx[ii] < 0 are indexes of non coupled force constants:
+//LFF[ii(xx)] : local force field associated with positive excitation &DualHPos[Idm(xx)].
+//LFF.Idx[ii(xx)] are defined for ii [LFF.Num[xx],LFF.Num[xx+1][
+//LFF.Idx[ii(xx)] < 0 are indexes of non coupled force constants:
 //KFC.KijNCpld[dd][mm] with dd=-LFF.Idx[ii]/NMode, mm=-LFF.Idx[ii]-dd*NMode;
-//0 <= LFF[xx].Idx[ii] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF[xx].Idx[ii]].
+//0 <= LFF.Idx[ii(xx)] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF.Idx[ii(xx)]].
 //LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
 //with a unique corresponding (ni,nj,nk,nl)  
-//LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[ 
 //NLFFPerEx[xx] : output array counting the number of force constant per excitation XPolSupPos[xx]
 //ThrPES : threshold for acceptable force constants.
 //NPES : Number of coupled PES coefficients stored in KFC.KijCpld
@@ -727,7 +740,7 @@ if(DoRot)
 }
 //
 uint32_t AssignLFFPerEx (int DegrePol, int NMode, int DoRot, int NPES, uint32_t NXDualHPlus,\
- KForce KFC, ConfigId *DualHPos, LocalFF *LFF, double **ZetaXYZ, double ThrKX, double ThrPES,\
+ KForce KFC, uint8_t *DualHPos, LocalFF LFF, double **ZetaXYZ, double ThrKX, double ThrPES,\
  uint32_t *Permuter, uint32_t *Corres, int IncK2)
 {
 //Routine that copies indexes of positive excitations of most contributing Local Force Fields
@@ -735,19 +748,19 @@ uint32_t AssignLFFPerEx (int DegrePol, int NMode, int DoRot, int NPES, uint32_t 
 //Corres : Correspondance array giving the indexes of the first NXDualHTruncPos most contributive positive excitations of H*.
 //Select only the ones such that Sum|FC|>ThrKX
 //DualHPos contains positive excitations in H*.
-//DualHPos[xx].Degrees[mm] is defined for (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
+//DualHPos[Idm(xx)+mm] is defined for (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
 //Force constants:
 //KFC. KijNCpld[dd][mm] : non coupled force constants, defined for (dd,mm) in [0,DegrePol[x[0,NMode[ (degree dd+1, mode mm<NMode).
 //KFC.KijCpld[kk] : coupled force constants, defined for kk in [0,NPES[.
 //KFC.Monm[kk][mm] = degree of monomial kk for coordinate mm in PES.
 //Local force field:
-//LFF[xx] : local force field associated with positive excitation DualHPos[xx].
-//LFF[xx].Idx[ii] < 0 are indexes of non coupled force constants:
+//LFF[ii(xx)] : local force field associated with positive excitation &DualHPos[Idm(xx)].
+//LFF.Idx[ii(xx)] are defined for ii [LFF.Num[xx],LFF.Num[xx+1][
+//LFF.Idx[ii(xx)] < 0 are indexes of non coupled force constants:
 //KFC.KijNCpld[dd][mm] with dd=-LFF.Idx[ii]/NMode, mm=-LFF.Idx[ii]-dd*NMode;
-//0 <= LFF[xx].Idx[ii] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF[xx].Idx[ii]].
+//0 <= LFF.Idx[ii(xx)] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF.Idx[ii(xx)]].
 //LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
 //with a unique corresponding (ni,nj,nk,nl)  
-//LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[ 
 //Permuter : permutation index array of elements of DualHPos (memcmp order)
 //ThrPES : threshold for acceptable force constants.
 //NPES : Number of coupled PES coefficients stored in KFC.KijCpld
@@ -773,14 +786,25 @@ uint32_t AssignLFFPerEx (int DegrePol, int NMode, int DoRot, int NPES, uint32_t 
 //
        double *Contrib=NULL; 
        Contrib=new double [NXDualHPlus]; 
+       uint32_t *LFFNUM=NULL; 
+       LFFNUM=new uint32_t [NXDualHPlus+1];
+//"" 
+
 // 
        double ContribLFF;//Contribution of force constants summed up in absolute value
 //
       for (uint32_t ii = 0; ii < NXDualHPlus; ii++)
       {
       Permuter[ii]=ii;
-      Contrib[ii]=0;
+      Contrib[ii]=0;   
       }
+//""Starting points of element number xx
+     for (uint32_t xx = 0; xx <= NXDualHPlus; xx++)
+      {
+       LFFNUM[xx]=LFF.Num[xx];
+      }
+//
+//
 //
  QuickSortMode(DualHPos,0,NXDualHPlus-1, Permuter, SizeBit);
 //Non coupled surfaces first for Local Force Constants
@@ -806,8 +830,10 @@ for (int mm=0; mm<NMode; mm++)
       IndexEx=QsearchMode(Tester, DualHPos,Permuter,NXDualHPlus, SizeBit);
       if(IndexEx>=0)
         {
-       LFF[IndexEx].Idx[LFF[IndexEx].Num]=-((NMode)*(kk)+mm);
-       LFF[IndexEx].Num++;
+//""       LFF[IndexEx].Idx[LFF[IndexEx].Num]=-((NMode)*(kk)+mm);
+       LFF.Idx[LFFNUM[IndexEx]]=-((NMode)*(kk)+mm);
+//""       LFF[IndexEx].Num++; Starting incremented up to LFF.Num[IndexEx+1];
+       LFFNUM[IndexEx]++;
        Contrib[IndexEx]+=ContribLFF;
         }
        Deg-=2;
@@ -834,8 +860,10 @@ do {
       IndexEx=QsearchMode(Tester,DualHPos,Permuter,NXDualHPlus, SizeBit);      
       if(IndexEx>=0)
        {
-       LFF[IndexEx].Idx[LFF[IndexEx].Num]=kk;
-       LFF[IndexEx].Num++;
+//""   LFF[IndexEx].Idx[LFF[IndexEx].Num]=kk;
+//""   LFF[IndexEx].Num++;
+       LFF.Idx[LFFNUM[IndexEx]]=kk;
+       LFFNUM[IndexEx]++;//Starting incremented up to LFF.Num[IndexEx+1];
        Contrib[IndexEx]+=ContribLFF;
        }
 //
@@ -872,8 +900,10 @@ if(DoRot)
       IndexEx=QsearchMode(Tester,DualHPos,Permuter,NXDualHPlus, SizeBit);      
       if(IndexEx>=0)
           {
-       LFF[IndexEx].Idx[LFF[IndexEx].Num]=NPES+NumRot;
-       LFF[IndexEx].Num++;
+//""       LFF[IndexEx].Idx[LFF[IndexEx].Num]=NPES+NumRot;
+//""       LFF[IndexEx].Num++;
+       LFF.Idx[LFFNUM[IndexEx]]=NPES+NumRot;
+       LFFNUM[IndexEx]++;//Starting incremented up to LFF.Num[IndexEx+1];
        Contrib[IndexEx]+=ContribLFF;
           }
         } while(nested_loop(MultiDegrees, NVMode, NMode));
@@ -896,6 +926,8 @@ for (int unsigned xx=1; xx<NXDualHPlus; xx++)
    }
  }
 //
+//""
+         delete [] LFFNUM;
          delete [] NVMode;
          delete [] MultiDegrees;
          delete [] Tester;

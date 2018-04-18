@@ -180,7 +180,7 @@ int CmptBlank(char *Tab, int taille)
 //
 int GetKeyWords(FILE *file1, int *NMode, int *DoRot, int *MaxEv, int *DeltaNev, int *AddTarget,int *PESType,\
     uint8_t TargetState[MaxTarget][MaxNormal], int *DoGraph, int *MAXNCV,\
-    int *MaxQLevel, int *NAdd, int *MaxAdd, int *PrintOut,  double *EpsRez, double *KNREZ,\
+    int *MaxQLevel, int *NAdd, int *MaxAdd, int *PrintOut, int *DoVPT, double *EpsRez, double *KNREZ,\
     double *KNNZ, double *KNZREZ, double *EtaComp, double *Tol,double *Kappa, double *ThrMat,double *ThrPES, double *ThrCoor,\
     double *GroundState, double* MinFreq, double *MaxFreq, double *Freq0Max, float *ThrKX, double *Memory,\
     int *Verbose, char *OutName, char *PESName, char* RefName)
@@ -239,6 +239,8 @@ int GetKeyWords(FILE *file1, int *NMode, int *DoRot, int *MaxEv, int *DeltaNev, 
         {sscanf(&chaine[curs], "%d", MaxQLevel);}
         else if (strcasecmp(chainedat,"NAdd")==0)
         {sscanf(&chaine[curs], "%d", NAdd);}
+        else if (strcasecmp(chainedat,"DoVPT")==0)
+        {sscanf(&chaine[curs], "%d", DoVPT);}
         else if (strcasecmp(chainedat,"MaxAdd")==0)
         {sscanf(&chaine[curs], "%d", MaxAdd);}
         else if (strcasecmp(chainedat,"Tol")==0)
@@ -1084,7 +1086,7 @@ int GetValRef(FILE *file, double TabRef[MaxRef])
   return Cnt;
 }
 //
-uint32_t GetConfsBin(FILE *FileBasis, ConfigId *&FinalBasis, int NMode, int* NScreen)
+uint32_t GetConfsBin(FILE *FileBasis, uint8_t *&FinalBasis, int NMode, int* NScreen)
 {    
 //Read the final basis set file previously stored in binary format
 //FinalBasis: where the configurations are stored
@@ -1104,19 +1106,26 @@ return 0;
 //read final size
 fread (&FinalSize, sizeof(uint32_t) , 1 , FileBasis); 
 //Allocate configs
-FinalBasis = new ConfigId [FinalSize];
-for (uint32_t kk = 0; kk < FinalSize; kk++)
-{InitMode(FinalBasis[kk], NMode);}
+FinalBasis = new uint8_t [FinalSize*NMode];
+//""new uint8_t [FinalSize*NMode];
+for (uint64_t kk = 0; kk < (uint64_t)FinalSize*NMode; kk++)
+{FinalBasis[kk]=0;}
+/*
+for (uint64_t kk = 0; kk < FinalSize*NMode; kk++)
+FinalBasis[kk]=0
+*/
 //
 //Copy configuration arrays in binary format
 for (uint32_t ll=0;ll<FinalSize;ll++)
  {
-fread (&FinalBasis[ll].Degrees[0], sizeof(uint8_t) , NMode , FileBasis);  
+//""
+fread (&FinalBasis[Idm(ll)], sizeof(uint8_t) , NMode , FileBasis);  
+//&FinalBasis[Idm(ll)]
  }
 return FinalSize;
 } 
 //
-void PrintConfsBin(char *OutBasis, ConfigId *FinalBasis, int NMode, int NScreen, uint32_t FinalSize)
+void PrintConfsBin(char *OutBasis, uint8_t *FinalBasis, int NMode, int NScreen, uint32_t FinalSize)
 { 
 //Print configurations of final basis set stored in FinalBasis into files with extension name
 //OutBasis, 
@@ -1133,7 +1142,9 @@ fwrite (&FinalSize, sizeof(uint32_t) , 1 , FileBasis);
 //Copy configuration arrays in binary format
 for (uint32_t ll=0;ll<FinalSize;ll++)
  {
-fwrite (&FinalBasis[ll].Degrees[0], sizeof(uint8_t) , NMode , FileBasis);
+//''
+fwrite (&FinalBasis[Idm(ll)], sizeof(uint8_t) , NMode , FileBasis);
+//""&FinalBasis[Idm(ll)]
 //           
  }     
 //

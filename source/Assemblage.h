@@ -1,7 +1,5 @@
 /*  
     Dual Vibration Configuration Interaction (DVCI).
-    A novel factorisation of molecular Hamiltonian for
-    high performance infrared spectrum computation.
     Copyright (C) 2018  Romain Garnier
 
     This program is free software: you can redistribute it and/or modify
@@ -25,6 +23,7 @@
 #define Assemblage_H
 #include "Shared.h"
 #include <pthread.h>
+#include <vector>
 
 #define NBuffer 1000
 #define MaxThread 100
@@ -81,8 +80,7 @@ Q[i][i]=0.5;}
 
 //Allocation +Fillin Matrix elements
 #define MatricesElem(QQ,DegPol,dimax,NMatrices)\
-MatrixElem *QQ=NULL;\
-QQ=new MatrixElem[NMatrices];\
+std::vector<MatrixElem> QQ(NMatrices);\
 for (int i=0;i<=DegPol;i++){\
 QQ[i].Coeff = NULL;\
 QQ[i].Coeff = new double* [dimax+DegPol];\
@@ -92,8 +90,7 @@ QQ[i].Coeff[kk]=new double[dimax+DegPol];}\
 MatrixQPower(QQ[i].Coeff, dimax+DegPol, i);}
 //Allocation only
 #define MatricesElemAllocate(QQ,dimax,NMatrices)\
-MatrixElem *QQ=NULL;\
-QQ=new MatrixElem[NMatrices];\
+std::vector<MatrixElem> QQ(NMatrices);\
 for (int i=0;i<NMatrices;i++){\
 QQ[i].Coeff = NULL;\
 QQ[i].Coeff = new double* [dimax];\
@@ -106,7 +103,7 @@ for (int kk = 0; kk < NMatrices; kk++){\
 for (int i = 0; i < DimMat; i++)\
 {delete [] QQ[kk].Coeff[i];}\
 delete [] QQ[kk].Coeff;}\
-delete [] QQ;
+QQ.clear();
 //
  struct MatrixElem
  {
@@ -117,15 +114,18 @@ void MatrixQPower(double **APow, int Dim, int Pow);
 //Compute the square matrix Q^(Pow) (Dimension Dim x Dim) and return it in APow
 //The matrix Q beeing <Psi_n(Q),Q,Psi_m(Q)>, (n,m)in [0,Dim[
 //
-double MatrixElement (int NMode, LocalFF LFF, int DegrePolP1,int NPES,\
- uint8_t *ModeLin, uint8_t *ModeCol, MatrixElem *QQ, KForce KFC, double **ZetaXYZ, double *Omega);
+/*double MatrixElement (int NMode, LocalFF LFF, int DegrePolP1,int NPES,\
+ uint8_t *ModeLin, uint8_t *ModeCol, std::vector<MatrixElem> QQ, KForce KFC, double **ZetaXYZ, double *Omega);*/
+double MatrixElement (int NMode, LocalFF LFF,uint32_t IndexEx,int DegrePolP1, int NPES,\
+ uint8_t *ModeLin, uint8_t *ModeCol, std::vector<MatrixElem> QQ, KForce KFC, double **ZetaXYZ, double *Omega);
 /*Compute <\Phi_Lin | H |\Phi_Col> for Lin = ModeLin and Col = ModeCol 
 (Lin and Col are multi-indexes of length NMode).
-Corresponding force constants are the one associated with index of excitation |Lin-Col| and are located in LFF.*/
+Corresponding force constants are the one associated with index of excitation |Lin-Col| and are located in LFF.
+Add IndexEx fater LFF*/
 //
 double MatrixEvalHarm (int NMode,int DegrePolP1,int NCPol, int NPES, int *DegreCoupl,\
- ConfigId ModeLin, ConfigId ModeCol,  KForce KFC, MatrixElem *QQ, double **ZetaXYZ, double *Omega,\
- unsigned int NXDualHPlus,ConfigId *DualHPos, LocalFF *LFF, unsigned int *Permuter, int LMC, int IncK2);
+ uint8_t *ModeLin, uint8_t *ModeCol,  KForce KFC, std::vector<MatrixElem> QQ, double **ZetaXYZ, double *Omega,\
+ unsigned int NXDualHPlus,uint8_t *DualHPos, LocalFF LFF, unsigned int *Permuter, int LMC, int IncK2);
 /*Compute matrix element between ModeLin(=multi-index Lin) and ModeCol(multi-index Col).
 Here matrix element <Phi_Lin | H |Phi_Col> involves the force constants included in
 {LFF(Lin-Col)}={K_[c1, ... , cn], |Lin_i-Col_i|=ci-2ti}, 
@@ -134,26 +134,30 @@ Lin-Col corresponds to an integer xx assigned to an excitation DualHPos[xx].
 IncK2:Say if the the harmonic energy should be added (IncK2=0) or not (IncK2=1)
 */ 
 //
-void FlyRezMVP2(ConfigId *ModeRez, ConfigId *ModeAct,ConfigId *DualHPos, MatrixElem *QQ,\
+void FlyRezMVP2(uint8_t *ModeRez, uint8_t *ModeAct,uint8_t *DualHPos, std::vector<MatrixElem> QQ,\
      unsigned int *Permuter, unsigned int *TabNull, KForce KFC,SizeArray *Size, int NMode,\
      CSC IJRez,unsigned int NXDualHPlus,  int DegrePol,\
      int NPES, int Iteration, int NScreen, int *TabScreen, SizeArray SizeMax,\
-     float *RezVect,LocalFF *LFF,double *EigVec, double **ZetaXYZ, double *Omega);
+     float *RezVect,LocalFF LFF,double *EigVec, double **ZetaXYZ, double *Omega);
 //
 /*Complete the matrix vector product Hsb*X for elements (Col,Lin) in (B-A)x(H*(B-A)-B)
  thanks to the graph of residual matrix stored in IJRez. */
 unsigned int AssembleHarmCSC (int NMode,int DegrePol, int NCPol, int Iteration, int NPES,\
- ConfigId *ModeAct,SizeArray *Size,KForce KFC,double *ValAct, CSC IJAct, MatrixElem *QQ, int *DegreCoupl,\
- double **ZetaXYZ, double *Omega, double ThrMat, uint64_t NNZActMax,ConfigId *DualHPos, LocalFF *LFF, \
+ uint8_t *ModeAct,SizeArray *Size,KForce KFC,double *ValAct, CSC IJAct, std::vector<MatrixElem> QQ, int *DegreCoupl,\
+ double **ZetaXYZ, double *Omega, double ThrMat, uint64_t NNZActMax,uint8_t *DualHPos, LocalFF LFF, \
  unsigned int *Permuter, unsigned int NXDualHPlus, int IncK2);
 //Assemble the graph of active sparse matrix in CSC format in IJAct, and compute NNZ values in ValAct.
 //Return the new number of non zero elements
 //IncK2:Say if the the harmonic energy should be added (IncK2=0) or not (IncK2=1)
 //
-double CorElem(uint8_t *ModeLin, uint8_t *ModeCol, int ni, int nj, int nk, int nl, MatrixElem *QQ, int DegrePolP1,\
+double CorElem(uint8_t *ModeLin, uint8_t *ModeCol, int ni, int nj, int nk, int nl, std::vector<MatrixElem> QQ, int DegrePolP1,\
 double *Omega, int NMode);
 //Evaluate corriolis integral terms between ModeLin(=m) and ModeCol(=n):
 //<Phi_m|(\sqrt{\nu_j/\nu_i}Qi*dQj- \sqrt{\nu_i/\nu_j} QjdQi)(\sqrt{\nu_l/\nu_k}Qk*dQl- \sqrt{\nu_k/\nu_l} Ql*dQk)|Phi_n>
 //m_i=n_i +- 1 or 2
 //
+void VPT2Energy(float *RezVect,const uint64_t DimRez, double *EigVal, uint8_t *ModeRez, int NScreen, int NPES, int DegrePol,\
+ int NMode, int *TabScreen, std::vector<MatrixElem> QQ,  SizeArray SizeMax, LocalFF LFF, double **ZetaXYZ, double *Omega, double *VPTE, KForce KFC);
+/*Return the VPT2 energy thanks to Hss entries from the residual vectors of the target
+according to formula: Delta E = \sum_{s in Bs} (Ys)^2/(E-Hss), Ys is the coordinate s of the residual vector Y.*/
 #endif

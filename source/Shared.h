@@ -1,7 +1,5 @@
 /*
     Dual Vibration Configuration Interaction (DVCI).
-    A novel factorisation of molecular Hamiltonian for
-    high performance infra-red spectrum computation.
     Copyright (C) 2018  Romain Garnier
 
     This program is free software: you can redistribute it and/or modify
@@ -71,7 +69,8 @@ Janet Hawkins Meal and S. R. Polo, The Journal of Chemical Physics 1956 24:6, 11
 
 #define MaxChar 10000
 #define MinChar 10
-
+//Mapping mode
+#define Idm(tartempion) (tartempion)*NMode
 //Allocation routines for array and structures
 #define allocate_MatDb(arr, n, m)\
 arr=NULL;\
@@ -138,10 +137,13 @@ delete [] arr;
 #define FreeTab(arr) delete [] arr;
 #define FreeCSC(IJ)\
 delete [] IJ.I; delete [] IJ.NJ;
-#define FreeLFF(LFF,NLFF)\
+/*#define FreeLFF(LFF,NLFF)\
 for (uint32_t i = 0 ; i < NLFF ; i++)\
 {DeleteLFF(LFF[i]);}\
-delete [] LFF;
+delete [] LFF;/*/
+#define FreeLFF(LFF)\
+delete [] LFF.Num;\
+delete [] LFF.Idx;
 //Display routines
 #define afficheMatInt(Mat, lin, col)\
 for (int i = 0 ; i < lin ; i++){\
@@ -166,20 +168,6 @@ printf("\n");
 #define DisplaySize(Size1)\
 printf("DimAct %u, DimRez %u, NNZAct %u, NNZRez %u \n",\
 Size1.DimAct,Size1.DimRez-Size1.DimAct,Size1.NNZAct,Size1.NNZRez);
-//Check size
-#define TestSize(Size1,SizeActMax,SizeRezMax,NNZActMax,NNZRezMax)\
-if (Size1.DimAct >= SizeActMax)\
-{printf("DimAct trop grande %u", Size1.DimAct);\
-return 0;}\
-else if (Size1.DimRez >= SizeRezMax)\
-{printf("DimRez trop grande %u", Size1.DimRez);\
-return 0;}\
-else if (Size1.NNZAct >= NNZActMax)\
-{printf("NNZAct trop grande %u", Size1.NNZAct);\
-return 0;} \
-else if (Size1.NNZRez >= NNZRezMax)\
-{printf("NNZRez trop grande %u", Size1.NNZRez);\
-return 0;}    
 //Initialisation array 
 #define InitTab(Tab, lin)\
 for (uint32_t i = 0 ; i < lin ; i++){Tab[i]=0;}
@@ -252,6 +240,7 @@ double *KijCpld;
 int32_t **Monm;
 };
 //
+#pragma pack(1)
 struct SizeArray
 {
 uint32_t DimAct;
@@ -261,6 +250,7 @@ uint64_t NNZRez;
 };
 //
 //typedef struct ConfigId ConfigId ;
+//typedef uint8_t ConfigId;
  struct ConfigId
  {
 uint8_t *Degrees;
@@ -275,7 +265,8 @@ uint8_t *Degrees;
 //LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
 //with a unique corresponding (ni,nj,nk,nl)  
 //LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[ 
-int32_t Num;
+
+uint32_t *Num;
 int32_t *Idx;
  };
 //
@@ -294,12 +285,10 @@ extern "C"
 void dsyev_(char* JOBZ, char* UPLO, int *N,double *A, int *LDA, double *W, double *WORK, int *LWORK,int *INFO );
 }
 //
-void InitMode(ConfigId & M1,int Nmode);
-void InitLFF(LocalFF& LFF,int NFF);
 double factorial(uint32_t n);
 //
 double GetEHarmonic0(uint8_t* Harm,int NMode, KForce KFC);
-////Return Harmonic energy sum_NM (d_i+0.5)*\nu_i
+//""Return Harmonic energy sum_NM (d_i+0.5)*\nu_i
 //
 void InitKforce(KForce KFC, double **KijNCpld, double *KijCpld,\
  int **Monm, int DegrePol, int NMode, int NPES);

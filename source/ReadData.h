@@ -50,7 +50,7 @@ and store positions of commas in PoCom*/
 //
 int GetKeyWords(FILE *file1, int *NMode, int *DoRot, int *MaxEv, int *DeltaNev, int *AddTarget,int *PESType,\
     uint8_t TargetState[MaxTarget][MaxNormal], int *DoGraph, int *MAXNCV,\
-    int *MaxQLevel, int *NAdd, int *MaxAdd, int *PrintOut,  double *EpsRez, double *KNREZ,\
+    int *MaxQLevel, int *NAdd, int *MaxAdd, int *PrintOut, int *DoVPT, double *EpsRez, double *KNREZ,\
     double *KNNZ, double *KNZREZ, double *EtaComp, double *Tol,double *Kappa, double *ThrMat,double *ThrPES, double *ThrCoor,\
     double *GroundState, double* MinFreq, double *MaxFreq, double *Freq0Max, float *ThrKX, double *Memory,\
     int *Verbose, char *OutName, char *PESName, char* RefName);
@@ -139,10 +139,10 @@ int GetValRef(FILE *file, double *TabRef);
 //
 int SubStringChar (const char *str, char *new_s, char C);
 //Read a string until C and copy it into news
-void PrintConfsBin(char *OutBasis, ConfigId *FinalBasis, int NMode, int NScreen, uint32_t FinalSize);
+void PrintConfsBin(char *OutBasis, uint8_t *FinalBasis, int NMode, int NScreen, uint32_t FinalSize);
 //Print configurations of final basis set stored in FinalBasis into files with extension name
 //OutBasis
-uint32_t GetConfsBin(FILE *FileBasis, ConfigId *&FinalBasis, int NMode, int* NScreen);
+uint32_t GetConfsBin(FILE *FileBasis, uint8_t *&FinalBasis, int NMode, int* NScreen);
 //Read the final basis set file previously stored in binary format
 //FinalBasis: where the configurations are stored
 //NScreen number of Target screened

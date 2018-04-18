@@ -1,7 +1,5 @@
 /* 
     Dual Vibration Configuration Interaction (DVCI).
-    A novel factorisation of molecular Hamiltonian for
-    high performance infrared spectrum computation. 
     Copyright (C) 2018  Romain Garnier
 
     This program is free software: you can redistribute it and/or modify
@@ -32,9 +30,9 @@
 #include "Assemblage.h"
 #include <algorithm>    
 //
-int GeneratorOnePoz (int NMode,  ConfigId *XPolSupPos, int MaxDeg)
+int GeneratorOnePoz (int NMode,  uint8_t *XPolSupPos, int MaxDeg)
 {    
-//Compute 1-d excitations and store it in XPolSupPos[xx].Degrees[mm] <= MaxDeg (xx,mm) in [0,NMode*MaxDeg +1[ x [0,NMode[.
+//Compute 1-d excitations and store it in XPolSupPos[Idm(xx)+mm] <= MaxDeg (xx,mm) in [0,NMode*MaxDeg +1[ x [0,NMode[.
      int SizeGen=0;
      int Cmpt=0;
      SizeGen=(MaxDeg)*NMode+1;
@@ -42,7 +40,8 @@ int GeneratorOnePoz (int NMode,  ConfigId *XPolSupPos, int MaxDeg)
 //
  for (int mm = 0 ; mm < NMode; mm++)
       {
-      XPolSupPos[0].Degrees[mm]=0;
+//""
+    XPolSupPos[mm]=0;
       }
       Cmpt++;
 //  
@@ -51,12 +50,14 @@ int GeneratorOnePoz (int NMode,  ConfigId *XPolSupPos, int MaxDeg)
 //
  for (int mm = 0; mm < NMode; mm++)
       {
-      XPolSupPos[Cmpt].Degrees[mm]=0;
+//""
+      XPolSupPos[Idm(Cmpt)+mm]=0;
       }
 //
       for (int dd = 1 ; dd <= MaxDeg; dd++)
       {
-      XPolSupPos[Cmpt].Degrees[ss]=dd;
+//""
+     XPolSupPos[Idm(Cmpt)+ss]=dd;
       Cmpt++;
       }
 //     
@@ -77,11 +78,11 @@ int GeneratorOnePoz (int NMode,  ConfigId *XPolSupPos, int MaxDeg)
    return SizeGen;
 }
 //
-uint32_t GetNXDualHTrunc(ConfigId *DualHPos,uint32_t NXDualHTruncPos,uint32_t *Corres, int NMode)
+uint32_t GetNXDualHTrunc(uint8_t *DualHPos,uint32_t NXDualHTruncPos,uint32_t *Corres, int NMode)
 {
 //Return the total number of excitations (+ et -) for the most contributive positive
 //excitations indexed by Corres[ee], with ee in [0,NXDualHPlus[. 
-//DualHPos[xx].Degrees[mm] is defined for (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
+//DualHPos[Idm(xx)+mm] is defined for (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
  int Cpld;
  uint32_t NXDualHTrunc=0;
  uint32_t xx;
@@ -90,7 +91,8 @@ uint32_t GetNXDualHTrunc(ConfigId *DualHPos,uint32_t NXDualHTruncPos,uint32_t *C
  {
  //Corres[ee] : index of the ee-th most contributive excitations
   xx=Corres[ee];
-  Cpld=CmptNNULL(DualHPos[xx].Degrees, NMode);
+//""
+    Cpld=CmptNNULL(&DualHPos[Idm(xx)], NMode);
   NXDualHTrunc+=Powo<int>(2,Cpld);
  }
 //
@@ -113,12 +115,12 @@ uint32_t CmptEct=0;
 return TotEct;
 }
 //
-uint32_t GeneratorXPoz (int NMode, int NEccit,  ConfigId *XPolSupPos, int SizeGenOld, int MaxDeg)
+uint32_t GeneratorXPoz (int NMode, int NEccit,  uint8_t *XPolSupPos, int SizeGenOld, int MaxDeg)
 {
 //Generator of double triple quadruple etc... raising excitations
-//The multi indexes of excitations are stored in XPolSupPos[xx].Degrees[n] (xx>=SizeGenOld, n<NMode)
+//The multi indexes of excitations are stored in XPolSupPos[Idm(xx)+n] (xx>=SizeGenOld, n<NMode)
 //NEccit is the number of couplings
-//The maximal degrees Sum_n XPolSupPos[xx].Degrees[n] <= MaxDeg
+//The maximal degrees Sum_n XPolSupPos[Idm(xx)+n] <= MaxDeg
       if(NEccit<2)
       {
       printf("Excitation must be equal to 2 at least\n");
@@ -193,7 +195,8 @@ do{
       {   
       for (int ee=0;ee<NEccit;ee++)
          {
-       XPolSupPos[SizeGen].Degrees[MultiSurf[ee]]=MultiDegrees[ee];
+//""
+    XPolSupPos[Idm(SizeGen)+MultiSurf[ee]]=MultiDegrees[ee];
          }
       SizeGen++; 
        }  
@@ -217,12 +220,12 @@ SizeGen-SizeGenOld,TotEct, MaxDeg, NEccit, Cmpt, NSurf\n \
    return SizeGen;
 }
 //
-uint32_t GeneratorTotPoz (int NMode, ConfigId *XPolSupPos, int *DegreEx, int NCPol)
+uint32_t GeneratorTotPoz (int NMode, uint8_t *XPolSupPos, int *DegreEx, int NCPol)
   {
 //Return the overall number of positive excitations in function
 //of DegreEx in each direction and the maximal number of couplings NCPol.
 //The excitations are stored in XPolSupPos,
-//defined for XPolSupPos[xx].Degrees[mm], (xx,mm) in [0,NGenPoz[ x [0,NMode[.
+//defined for XPolSupPos[Idm(xx)+mm], (xx,mm) in [0,NGenPoz[ x [0,NMode[.
     uint32_t SizeGenOld = GeneratorOnePoz (NMode, XPolSupPos, DegreEx[0]);  
    //double and Triple and superior excitation
     for(int ee=2;ee<=NCPol;ee++)
@@ -233,11 +236,11 @@ uint32_t GeneratorTotPoz (int NMode, ConfigId *XPolSupPos, int *DegreEx, int NCP
     return SizeGenOld;
   }
 //
-uint64_t PolyX(ConfigId *ModeRez, ConfigId *ModeAct,ConfigId *DualHPos, MatrixElem *QQ,\
+uint64_t PolyX(uint8_t *ModeRez, uint8_t *ModeAct,uint8_t *DualHPos, std::vector<MatrixElem> QQ,\
     uint32_t *PermutRez, uint32_t *PermutAct, uint32_t *Corres,\
      KForce KFC,SizeArray *Size, uint8_t *Pid, double Freq0Max, double Freq0Min, int NMode, \
      uint32_t NXDualHTruncPos, int NCPol, int DegrePol, int NPES, int Iteration, int NScreen,\
-     int *TabScreen, SizeArray SizeMax, float *RezVect,LocalFF *LFF,double *EigVec,\
+     int *TabScreen, SizeArray SizeMax, float *RezVect,LocalFF LFF,double *EigVec,\
     double **ZetaXYZ, double *Omega,CSC IJRez)
 {
 /*Compute the secondary space stored in  ModeRez applying the NXDualHTruncPos excitations of DualHPos on configurations stored in ModeAct.
@@ -245,11 +248,11 @@ And at the same time the incomplete matrix vector product Hsb*X is calculated on
 stored in IJRez.
 The space H*(A) is fetched at each iteration where A is the set of added basis functions.
 Pid : Maximal quantum level in each direction.
-DualHPos : Multi index arrays of raising excitations. Defined for DualHPos[xx].Degrees[mm], (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
+DualHPos : Multi index arrays of raising excitations. Defined for DualHPos[Idm(xx)+mm], (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
 Corres : Correspondance array giving the indexes of the first NXDualHTruncPos most contributive excitations of DualHPos.
 Freq0Max : harmonic energy wall above the ground state.
-ModeAct : Multi-dimensional array for active space B : ModeAct[nn].Degrees[mm], (nn,mm) in [0,SizeActMax[ x [0,NMode[.
-ModeRez : Multi-dimensional array for residual space : ModeRez[nn].Degrees[mm], (nn,mm) in [0,SizeRezMax[ x [0,NMode[.
+ModeAct : Multi-dimensional array for active space B : ModeAct[Idm(nn)+mm], (nn,mm) in [0,SizeActMax[ x [0,NMode[.
+ModeRez : Multi-dimensional array for residual space : ModeRez[Idm(nn)+mm], (nn,mm) in [0,SizeRezMax[ x [0,NMode[.
 PermutRez : indexes of permutations for sorted elements in ModeRez 
 PermutAct : indexes of permutations for sorted elements in ModeAct
 TabScreen : Indexes of targeted eigen-pairs
@@ -258,13 +261,13 @@ KFC. KijNCpld[dd][mm] : non coupled force constants, defined for (dd,mm) in [0,D
 KFC.KijCpld[kk] : coupled force constants, defined for kk in [0,NPES[.
 KFC.Monm[kk][mm] = degree of monomial kk for coordinate mm in PES.
 Local force field:
-LFF[xx] : local force field associated with positive excitation DualHPos[xx].
-LFF[xx].Idx[ii] < 0 are indexes of non coupled force constants:
+LFF[ii(xx)] : local force field associated with positive excitation &DualHPos[Idm(xx)].
+LFF.Idx[ii(xx)] are defined for ii [LFF.Num[xx],LFF.Num[xx+1][
+LFF.Idx[ii(xx)] < 0 are indexes of non coupled force constants:
 KFC.KijNCpld[dd][mm] with dd=-LFF.Idx[ii]/NMode, mm=-LFF.Idx[ii]-dd*NMode;
-0 <= LFF[xx].Idx[ii] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF[xx].Idx[ii]].
+0 <= LFF.Idx[ii(xx)] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF.Idx[ii(xx)]].
 LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
 with a unique corresponding (ni,nj,nk,nl)  
-LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[ 
 Compressed sparse  column format for IJRez:
 IJRez.NJ[jj] = number of the first nnz elmement of column jj
 IJRez.I[nn] = line number of nnz element number nn 
@@ -331,16 +334,19 @@ uint32_t Start=Size[Iteration].DimAct;
 //
 for (Lin=Start ; Lin < Size[Iteration+1].DimAct ; Lin++)//Start from previous subspace construction
 {
-  Freq0=GetFreq0(ModeAct[Lin].Degrees,NMode, KFC);
+//""
+  Freq0=GetFreq0(&ModeAct[Idm(Lin)],NMode, KFC); 
   AssignFirstCol=1;
  //Browse all the non null excitations
  for (uint32_t ee=1; ee < NXDualHTruncPos; ee++)
  {
  //Start with tester equal to active mode
   xx=Corres[ee];
-  Cpld=ConvertX(DualHPos[xx].Degrees, Surf, NMode); 
+//""
+  Cpld=ConvertX(&DualHPos[Idm(xx)], Surf, NMode); 
   InitTabInt(MultiDegrees2, Cpld)
-  memcpy(Tester,ModeAct[Lin].Degrees, SizeBit);
+//""
+   memcpy(Tester,&ModeAct[Idm(Lin)], SizeBit);
  //Start with tester equal to active mode
  do
   {               
@@ -348,8 +354,10 @@ for (Lin=Start ; Lin < Size[Iteration+1].DimAct ; Lin++)//Start from previous su
     go=1;
    while ( (ss<Cpld) && go )
     {//Generate product of positive and negative excitations from positive ones.
-    Ect[ss]=DualHPos[xx].Degrees[Surf[ss]]*Powo<int>(-1,MultiDegrees2[ss]);
-    TestNeg=Ect[ss]+ModeAct[Lin].Degrees[Surf[ss]];
+//""
+    Ect[ss]=DualHPos[Idm(xx)+Surf[ss]]*Powo<int>(-1,MultiDegrees2[ss]);
+//""
+    TestNeg=Ect[ss]+ModeAct[Idm(Lin)+Surf[ss]];
     if(TestNeg < 0 || TestNeg >= Pid[Surf[ss]]){go=0;}
     else
      {
@@ -415,22 +423,26 @@ if(go)
        if(LinRez<0)  
         {
           {
-          LinRez=LinearModeSearch(&ModeRez[KQSort*MaxQSortSeq], Tester, SizeBit,RestQSort);
+//''
+          LinRez=LinearModeSearch(&ModeRez[Idm(KQSort*MaxQSortSeq)], Tester, SizeBit,RestQSort);
           if(LinRez>=0)
            {
           LinRez+=KQSort*MaxQSortSeq;
            }
           }
          }
-             MatElem=MatrixElement (NMode, LFF[xx],DegrePolP1,\
-             NPES, ModeAct[Lin].Degrees, Tester, QQ,KFC, ZetaXYZ, Omega);
-//     
+//""
+             MatElem=MatrixElement (NMode, LFF, xx, DegrePolP1,\
+             NPES, &ModeAct[Idm(Lin)], Tester, QQ,KFC, ZetaXYZ, Omega);
+//
+//""     
       if ((LinRez<0))
       {
       if (Size[Iteration+1].DimRez < SizeMax.DimRez && Size[Iteration+1].NNZRez < SizeMax.NNZRez ) 
        {
       //Last element will be copied in the the residual space ModeRez
-      memcpy(&ModeRez[Size[Iteration+1].DimRez].Degrees[0],Tester,SizeBit);
+//""
+        memcpy(&ModeRez[Idm(Size[Iteration+1].DimRez)],Tester,SizeBit);
        for (int ll=0; ll < NScreen; ll++)
         {      
       RezVect[Size[Iteration+1].DimRez+SizeMax.DimRez*ll]+= MatElem*\
@@ -503,22 +515,23 @@ if(go)
    return CheckOutputPolyX;
 }
 //
-uint64_t PolyXNoG(ConfigId *ModeRez, ConfigId *ModeAct,ConfigId *DualHPos, MatrixElem *QQ,\
+uint64_t PolyXNoG(uint8_t *ModeRez, uint8_t *ModeAct,uint8_t *DualHPos, std::vector<MatrixElem> QQ,\
     uint32_t *PermutRez, uint32_t *PermutAct, uint32_t *Corres,\
      KForce KFC,SizeArray *Size, uint8_t *Pid, double Freq0Max, double Freq0Min, int NMode, \
      uint32_t NXDualHTruncPos, int NCPol, int DegrePol, int NPES, int Iteration, int NScreen,\
-     int *TabScreen, SizeArray SizeMax, float *RezVect,LocalFF *LFF,double *EigVec,\
+     int *TabScreen, SizeArray SizeMax, float *RezVect,LocalFF LFF,double *EigVec,\
     double **ZetaXYZ, double *Omega)
 {
 /*Compute the secondary space stored in  ModeRez applying the NXDualHTruncPos excitations of DualHPos on configurations stored in ModeAct.
 And at the same time the complete matrix vector product Hsb*X is calculated on the fly. No graph of residual matrix is computed in here.
 The whole space H*(B) is fetched at each iteration.
 Pid : Maximal quantum level in each direction.
-DualHPos : Multi index arrays of raising excitations. Defined for DualHPos[xx].Degrees[mm], (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
+DualHPos : Multi index arrays of raising excitations. Defined for DualHPos[Idm(xx)+mm], (xx,mm) in [0,NXDualHPlus[ x [0,NMode[.
+Changed to DualHPos[Idx(xx)+mm]
 Corres : Correspondance array giving the indexes of the first NXDualHTruncPos most contributive excitations of DualHPos.
 Freq0Max : harmonic energy wall above the ground state.
-ModeAct : Multi-dimensional array for active space. Defined for ModeAct[nn].Degrees[mm], (nn,mm) in [0,SizeActMax[ x [0,NMode[.
-ModeRez : Multi-dimensional array for residual space : ModeRez[nn].Degrees[mm], (nn,mm) in [0,SizeRezMax[ x [0,NMode[.
+ModeAct : Multi-dimensional array for active space. Defined for ModeAct[Idm(nn)+mm], (nn,mm) in [0,SizeActMax[ x [0,NMode[.
+ModeRez : Multi-dimensional array for residual space : ModeRez[Idm(nn)+mm], (nn,mm) in [0,SizeRezMax[ x [0,NMode[.
 PermutRez : indexes of permutations for sorted elements in ModeRez 
 PermutAct : indexes of permutations for sorted elements in ModeAct
 TabScreen : Indexes of targeted eigen-pairs
@@ -527,13 +540,13 @@ KFC. KijNCpld[dd][mm] : non coupled force constants, defined for (dd,mm) in [0,D
 KFC.KijCpld[kk] : coupled force constants, defined for kk in [0,NPES[.
 KFC.Monm[kk][mm] = degree of monomial kk for coordinate mm in PES.
 Local force field:
-LFF[xx] : local force field associated with positive excitation DualHPos[xx].
-LFF[xx].Idx[ii] < 0 are indexes of non coupled force constants:
+LFF.Idx[ii(xx)] are defined for ii [LFF.Num[xx],LFF.Num[xx+1][
+LFF[ii(xx)] : local force field associated with positive excitation &DualHPos[Idm(xx)].
+LFF.Idx[ii(xx)] < 0 are indexes of non coupled force constants:
 KFC.KijNCpld[dd][mm] with dd=-LFF.Idx[ii]/NMode, mm=-LFF.Idx[ii]-dd*NMode;
-0 <= LFF[xx].Idx[ii] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF[xx].Idx[ii]].
+0 <= LFF.Idx[ii(xx)] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF.Idx[ii(xx)]].
 LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
 with a unique corresponding (ni,nj,nk,nl)  
-LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[  
 NCPol : maximal number of couplings.
 DegrePol : maximal degree in the PES.
 Omega : harmonic frequencies in hartree for conversion of rotational elements.
@@ -596,24 +609,30 @@ uint32_t Start=0;
 //
 for (Lin=Start ; Lin < Size[Iteration+1].DimAct ; Lin++)//Start from 0 : takes more time compared to PolyX
 {
-  Freq0=GetFreq0(ModeAct[Lin].Degrees,NMode, KFC);
+//""
+    Freq0=GetFreq0(&ModeAct[Idm(Lin)],NMode, KFC);
  //Browse all the non null excitations
  for (uint32_t ee=1; ee < NXDualHTruncPos; ee++)
  {
  //Start with tester equal to active mode
   xx=Corres[ee];
-  Cpld=ConvertX(DualHPos[xx].Degrees, Surf, NMode); 
+//""
+  Cpld=ConvertX(&DualHPos[Idm(xx)] , Surf, NMode);
+//""
   InitTabInt(MultiDegrees2, Cpld)
-  memcpy(Tester,ModeAct[Lin].Degrees, SizeBit);
-  //Start with tester equal to active mode
+//""
+//Start with tester equal to active mode
+  memcpy(Tester, &ModeAct[Idm(Lin)], SizeBit);
  do
   {               
     ss=0;
     go=1;
    while ( (ss<Cpld) && go )
     {//Generate product of positive and negative excitations from positive ones.
-    Ect[ss]=DualHPos[xx].Degrees[Surf[ss]]*Powo<int>(-1,MultiDegrees2[ss]);
-    TestNeg=Ect[ss]+ModeAct[Lin].Degrees[Surf[ss]];
+//""
+    Ect[ss]=DualHPos[Idm(xx)+Surf[ss]]*Powo<int>(-1,MultiDegrees2[ss]);
+//""
+    TestNeg=Ect[ss]+ModeAct[Idm(Lin)+Surf[ss]];
     if(TestNeg < 0 || TestNeg >= Pid[Surf[ss]]){go=0;}
     else
      {
@@ -680,7 +699,8 @@ if(go)
        if(LinRez<0)  
         {
           {
-          LinRez=LinearModeSearch(&ModeRez[KQSort*MaxQSortSeq], Tester, SizeBit,RestQSort);
+//''
+          LinRez=LinearModeSearch(&ModeRez[Idm(KQSort*MaxQSortSeq)], Tester, SizeBit,RestQSort);
           if(LinRez>=0)
            {
           LinRez+=KQSort*MaxQSortSeq;
@@ -688,15 +708,17 @@ if(go)
           }
          }
 //
-             MatElem=MatrixElement (NMode, LFF[xx], DegrePolP1,\
-             NPES, ModeAct[Lin].Degrees, Tester, QQ,KFC, ZetaXYZ, Omega);
-//     
+//""     
+
+             MatElem=MatrixElement (NMode, LFF, xx ,DegrePolP1,\
+             NPES, &ModeAct[Idm(Lin)], Tester, QQ,KFC, ZetaXYZ, Omega);
+//
       if ((LinRez<0))
       {
       if (Size[Iteration+1].DimRez < SizeMax.DimRez ) 
        {
 //Last element will be copied in the the residual space mode ModeRez
-      memcpy(&ModeRez[Size[Iteration+1].DimRez].Degrees[0],Tester,SizeBit);
+      memcpy(&ModeRez[Idm(Size[Iteration+1].DimRez)],Tester,SizeBit);
        for (int ll=0; ll < NScreen; ll++)
         {      
       RezVect[Size[Iteration+1].DimRez+SizeMax.DimRez*ll]+= MatElem*\

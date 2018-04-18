@@ -1,7 +1,5 @@
 /*
     Dual Vibration Configuration Interaction (DVCI).
-    A novel factorisation of molecular Hamiltonian for
-    high performance infrared spectrum computation.
     Copyright (C) 2018  Romain Garnier
 
     This program is free software: you can redistribute it and/or modify
@@ -56,7 +54,7 @@ Romain Garnier, submitted in 2018.\n");
      { 
       printf("\n***Usage: ../../source/FinalVCI Key.in***\n");
       printf("One argument requested : Key file missing.  \n");
-      printf("DVCI should have been previously run with PrintOut=2. \n\n");
+      printf("DVCI should have been previously run with PrintOut>1. \n\n");
       FinalMessaj()
       return 0;
      } 
@@ -115,13 +113,14 @@ NNZActMax=SizeActMax*(KNNZ)*(NXDualHTrunc)
 NNZRezMax=SizeActMax*(KNZREZ)*(NXDualHTrunc) 
 */
 int DoGraph=1; // If not equal to zero, it will store the graph of residual matrix in CSC format
+int DoVPT=0;//If positif add correction vector and correction energy to targets
 //to gain computational time and then significantly increases memory requirement
 //
 printf("\n*****Reading Datas*****\n");
 //
 int NTargetStates=GetKeyWords(FileKey, &NMode, &DoRot, &MaxEv, &DeltaNev, &AddTarget,\
     &PESType, TargetState, &DoGraph, &MAXNCV,\
-    &MaxQLevel, &NAdd, &MaxAdd, &PrintOut, &EpsRez, &KNREZ, &KNNZ, &KNZREZ, &EtaComp,\
+    &MaxQLevel, &NAdd, &MaxAdd, &PrintOut, &DoVPT, &EpsRez, &KNREZ, &KNNZ, &KNZREZ, &EtaComp,\
      &Tol, &Kappa, &ThrMat, &ThrPES, &ThrCoor, &GroundState, &MinFreq, &MaxFreq, &Freq0Max, &ThrKX,\
     &Memory, &Verbose, OutName, PESName, RefName);
 //
@@ -273,9 +272,9 @@ else{printf("\n FileRef detected \n");}
 //
   char OutBasis[MaxChar]={0};
 //
-  char BasisOut[30]="-FinalBasis.bin";//Final basis file name if PrintOut = 1
+  char BasisOut[30]="-FinalBasis.bin";//Final basis file name if PrintOut = 2
 //
-  char MatOut[30]="-Matrix.bin";//Binary file name with targeted eigenvectors if PrintOut = 1
+  char MatOut[30]="-Matrix.bin";//Binary file name with matrix coefficients if PrintOut = 2
 //
   sprintf(OutMat, "%s", OutName);
   sprintf(OutBasis, "%s", OutName);
@@ -312,8 +311,9 @@ uint32_t DimAct,SizeInit;
 //
 int NScreen=0;//NUmber of screened states in output
 //
-ConfigId *ModeAct=NULL;
-//Configuration space
+uint8_t *ModeAct=NULL;
+//ConfigId *ModeAct=NULL;
+////Configuration space
  if(!GetConfsBin(FileBasis, ModeAct, NMode, &NScreen))
   {
   FinalMessaj()
@@ -542,8 +542,9 @@ fclose(FileMat);
 //
      FreeCSC(IJAct)
 //
-     FreeTabMode(ModeAct,DimAct)
+//'' FreeTabMode(ModeAct,DimAct)
 // 
+     delete [] ModeAct;
      delete [] Size;
      delete [] workd;
      delete [] workl;

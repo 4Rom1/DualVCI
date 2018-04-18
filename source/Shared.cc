@@ -45,29 +45,7 @@ Janet Hawkins Meal and S. R. Polo, The Journal of Chemical Physics 1956 24:6, 11
 #include "Basic.h"
 #include <string.h>
 #include <sys/time.h>
-//
-void InitMode(ConfigId& M1,int Nmode)
-{
-   	int mm;
-   	M1.Degrees=NULL;
-   	M1.Degrees=new uint8_t [Nmode];
-   	for (mm = 0 ; mm < Nmode; mm++)
-    	{
-     	M1.Degrees[mm] = 0;
-    	} 
-}
-void InitLFF(LocalFF& LFF,int NFF)
-{
-   	int mm;
-   	LFF.Num=0;
-        LFF.Idx=NULL;
-   	LFF.Idx=new int32_t [NFF];
-   	for (mm = 0 ; mm < NFF; mm++)
-    	{
-     	LFF.Idx[mm] = 0;
-    	}         
-}
-//
+////
 double GetEHarmonic0(uint8_t* Harm,int NMode, KForce KFC)
 {//Return Harmonic energy sum_NM (d_i+0.5)*\nu_i
 double Val=0;
@@ -181,7 +159,7 @@ const uint64_t DimRez,const int NAdd, int MaxAdd, const float Thr, int NNotConv,
      }
     cmpt++;
     }
-
+//
 float Thrtmp=0;
 uint32_t Indextmp=0;
 cmpt=NScreenNC;
@@ -212,12 +190,12 @@ int go=1;
    }
     ll++;
   }
-// 
+//Reset residual vector to zero 
    for (ll=0;ll<NScreenTot;ll++)
     {
      for (uint32_t nn=0; nn<DimRez; nn++)
      {
-    Vec[nn+ll*SizeRezMax]=0;
+    Vec[nn+ll*SizeRezMax]=0.0;
      }
     }
 return cmpt;
@@ -749,3 +727,5 @@ for (uint32_t nn=0;nn<Dim;nn++)
 {Scual+=X[nn]*Y[nn];}
 return Scual;
 }
+
+

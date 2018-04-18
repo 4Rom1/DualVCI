@@ -50,6 +50,21 @@ int find_minimum(T *MonTab, int n)
   }
   return index;
 }
+template<typename T>
+T MinimumVal(T *MonTab, int n) 
+{
+  int c;
+  T min;
+  min = MonTab[0];
+  for (c = 1; c < n; c++) {
+    if (MonTab[c] < min) 
+    {
+       min = MonTab[c];
+    }
+  }
+  return min;
+}
+
 //
 template<typename T>
 int find_maximum(T *MonTab, int n)

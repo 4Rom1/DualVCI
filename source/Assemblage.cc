@@ -31,6 +31,7 @@
 #include <string.h>
 #include "Basic.h"
 #include <cassert>
+#include <float.h>
 //
 void MatrixQPower(double **APow, int Dim, int Pow)
 {
@@ -71,7 +72,7 @@ FreeMat(B,Dim)
 FreeMat(Q,Dim)
 }
 //
-double CorElem(uint8_t *ModeLin, uint8_t *ModeCol, int ni, int nj, int nk, int nl, MatrixElem *QQ, int DegrePolP1,\
+double CorElem(uint8_t *ModeLin, uint8_t *ModeCol, int ni, int nj, int nk, int nl, std::vector<MatrixElem> QQ, int DegrePolP1,\
 double *Omega, int NMode)
 {
 //Evaluate corriolis integral terms between ModeLin(=m) and ModeCol(=n):
@@ -168,8 +169,8 @@ return Tot;
 }
 
 double MatrixEvalHarm (int NMode,int DegrePolP1,int NCPol, int NPES, int *DegreCoupl,\
- ConfigId ModeLin, ConfigId ModeCol,  KForce KFC, MatrixElem *QQ, double **ZetaXYZ, double *Omega,\
- uint32_t NXDualHPlus,ConfigId *DualHPos, LocalFF *LFF, uint32_t *Permuter, int LMC, int IncK2)
+ uint8_t *ModeLin, uint8_t *ModeCol,  KForce KFC, std::vector<MatrixElem> QQ, double **ZetaXYZ, double *Omega,\
+ uint32_t NXDualHPlus,uint8_t *DualHPos, LocalFF LFF, uint32_t *Permuter, int LMC, int IncK2)
 {
 /*Compute matrix element between ModeLin(=multi-index Lin) and ModeCol(multi-index Col).
 Here matrix element <Phi_Lin | H |Phi_Col> involves the force constants included in
@@ -182,13 +183,13 @@ Lin-Col corresponds to an integer xx assigned to an excitation DualHPos[xx].
 //KFC.KijCpld[kk] : coupled force constants, defined for kk in [0,NPES[.
 //KFC.Monm[kk][mm] = degree of monomial kk for coordinate mm in PES.
 //Local force field:
-//LFF[xx] : local force field associated with positive excitation DualHPos[xx].
-//LFF[xx].Idx[ii] < 0 are indexes of non coupled force constants:
+//LFF[ii(xx)] : local force field associated with positive excitation &DualHPos[Idm(xx)].
+//LFF.Idx[ii(xx)] are defined for ii [LFF.Num[xx],LFF.Num[xx+1][
+//LFF.Idx[ii(xx)] < 0 are indexes of non coupled force constants:
 //KFC.KijNCpld[dd][mm] with dd=-LFF.Idx[ii]/NMode, mm=-LFF.Idx[ii]-dd*NMode;
-//0 <= LFF[xx].Idx[ii] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF[xx].Idx[ii]].
+//0 <= LFF.Idx[ii(xx)] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF.Idx[ii(xx)]].
 //LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
 //with a unique corresponding (ni,nj,nk,nl)  
-//LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[ 
 //Permuter : give a sorted order (according to memcmp) of elements of DualHPos.
 //ZetaXYZ[ijkl]=\sum_{(\alpha ,\beta)\in (x,y,z)} \mu_{\alpha,\beta}\zeta_{ij}^{\alpha}\zeta_{kl}^{\beta}
 //Omega : Harmonic force constants in Hartree, used as conversion factor to compute rotational matrix elements
@@ -214,22 +215,32 @@ ValMat=0;
 if(!LMC)
 {
   IndexEx=0;
-  ValMat=MatrixElement (NMode, LFF[IndexEx],DegrePolP1,\
-       NPES, ModeLin.Degrees, ModeCol.Degrees, QQ,KFC, ZetaXYZ, Omega);
+//""
+
+  ValMat=MatrixElement (NMode, LFF, IndexEx,DegrePolP1,\
+       NPES, ModeLin, ModeCol, QQ,KFC, ZetaXYZ, Omega);
   if(!IncK2)
   {
-  ValMat+=GetEHarmonic0(ModeLin.Degrees, NMode, KFC);
+//""
+     ValMat+=GetEHarmonic0(ModeLin, NMode, KFC);
   }
 }
 else
 {
-//
+//""
 for(int ii=0;ii<NMode;ii++)
  {
-if(ModeLin.Degrees[ii]>ModeCol.Degrees[ii])
-  {Tester[ii]=ModeLin.Degrees[ii]-ModeCol.Degrees[ii];}
+  if(ModeLin[ii]>ModeCol[ii])
+//""
+  {
+//""
+    Tester[ii]=ModeLin[ii]-ModeCol[ii];
+  }
 else
-  {Tester[ii]=ModeCol.Degrees[ii]-ModeLin.Degrees[ii];}
+  {
+//""
+   Tester[ii]=ModeCol[ii]-ModeLin[ii];
+  }
  }
 //
 int Cpld=CmptNNULL(Tester, NMode);
@@ -244,8 +255,9 @@ if(DistanceModal<=DegreCoupl[Cpld-1])//Only for Harmonic basis set : Start with 
  IndexEx=QsearchMode(Tester, DualHPos,Permuter,NXDualHPlus, NMode);
  if(IndexEx>0)//Zero treated separately
    {
-  ValMat=MatrixElement (NMode, LFF[IndexEx],DegrePolP1,\
-       NPES, ModeLin.Degrees, ModeCol.Degrees, QQ,KFC, ZetaXYZ, Omega);
+//""
+  ValMat=MatrixElement (NMode, LFF, IndexEx, DegrePolP1,\
+       NPES, ModeLin, ModeCol, QQ,KFC, ZetaXYZ, Omega);
    }
   }
  } 
@@ -256,8 +268,8 @@ return ValMat;
 }
 //
 uint32_t AssembleHarmCSC (int NMode,int DegrePol, int NCPol, int Iteration, int NPES,\
- ConfigId *ModeAct,SizeArray *Size,KForce KFC,double *ValAct, CSC IJAct, MatrixElem *QQ, int *DegreCoupl,\
- double **ZetaXYZ, double *Omega, double ThrMat, uint64_t NNZActMax,ConfigId *DualHPos, LocalFF *LFF, \
+ uint8_t *ModeAct,SizeArray *Size,KForce KFC,double *ValAct, CSC IJAct, std::vector<MatrixElem> QQ, int *DegreCoupl,\
+ double **ZetaXYZ, double *Omega, double ThrMat, uint64_t NNZActMax,uint8_t *DualHPos, LocalFF LFF, \
  uint32_t *Permuter, uint32_t NXDualHPlus, int IncK2)
 {
 //Assemble the graph of sparse matrix Hb in CSC format in IJAct, and compute NNZ values in ValAct.
@@ -267,15 +279,15 @@ uint32_t AssembleHarmCSC (int NMode,int DegrePol, int NCPol, int Iteration, int 
 //KFC.KijCpld[kk] : coupled force constants, defined for kk in [0,NPES[.
 //KFC.Monm[kk][mm] = degree of monomial kk for coordinate mm in PES.
 //Local force field:
-//LFF[xx] : local force field associated with positive excitation DualHPos[xx].
-//LFF[xx].Idx[ii] < 0 are indexes of non coupled force constants:
+//LFF[ii(xx)] : local force field associated with positive excitation &DualHPos[Idm(xx)].
+//LFF.Idx[ii(xx)] are defined for ii [LFF.Num[xx],LFF.Num[xx+1][
+//LFF.Idx[ii(xx)] < 0 are indexes of non coupled force constants:
 //KFC.KijNCpld[dd][mm] with dd=-LFF.Idx[ii]/NMode, mm=-LFF.Idx[ii]-dd*NMode;
-//0 <= LFF[xx].Idx[ii] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF[xx].Idx[ii]].
+//0 <= LFF.Idx[ii(xx)] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF.Idx[ii(xx)]].
 //LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
 //with a unique corresponding (ni,nj,nk,nl)  
-//LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[  
 //Permuter : give a sorted order (according to memcmp) of elements of DualHPos.
-//ModeAct[Lin].Degrees multi-index array of length NMode corresponding to one element Lin in active space B.
+//ModeAct[Idm(Lin)] multi-index array of length NMode corresponding to one element Lin in active space B.
 //ZetaXYZ[ijkl]=\sum_{(\alpha ,\beta)\in (x,y,z)} \mu_{\alpha,\beta}\zeta_{ij}^{\alpha}\zeta_{kl}^{\beta}
 //Omega : Harmonic force constants in Hartree : used as conversion factor to compute \sqrt{\frac{\nu_j}{\nu_i}},\sqrt{\frac{\nu_p}{\nu_m}}
 //in coriolis terms
@@ -306,9 +318,11 @@ AssignFirstCol=1;
 for (Lin=0 ; Lin <= Col ; Lin++)
  {
  LMC=Col-Lin;
- ValMat=MatrixEvalHarm(NMode, DegrePolP1, NCPol, NPES, DegreCoupl,\
-  ModeAct[Col],ModeAct[Lin], KFC, QQ, ZetaXYZ, Omega,NXDualHPlus, DualHPos, LFF, Permuter, LMC, IncK2);
-//
+/* ValMat=MatrixEvalHarm(NMode, DegrePolP1, NCPol, NPES, DegreCoupl,\
+  ModeAct[Col],ModeAct[Lin], KFC, QQ, ZetaXYZ, Omega,NXDualHPlus, DualHPos, LFF, Permuter, LMC, IncK2);*/
+//""
+  ValMat=MatrixEvalHarm(NMode, DegrePolP1, NCPol, NPES, DegreCoupl,\
+  &ModeAct[Idm(Col)],&ModeAct[Idm(Lin)], KFC, QQ, ZetaXYZ, Omega,NXDualHPlus, DualHPos, LFF, Permuter, LMC, IncK2);
 if( (SIGN<double>(ValMat)*ValMat>ThrMat)  )
     {
     if(Size[Iteration+1].NNZAct < NNZActMax)     
@@ -338,10 +352,14 @@ IJAct.NJ[Size[Iteration+1].DimAct]=Size[Iteration+1].NNZAct;
 return Size[Iteration+1].DimAct;
 }
 //
-double MatrixElement (int NMode, LocalFF LFF, int DegrePolP1, int NPES,\
- uint8_t *ModeLin, uint8_t *ModeCol, MatrixElem *QQ, KForce KFC, double **ZetaXYZ, double *Omega)
+/*double MatrixElement (int NMode, LocalFF LFF, int DegrePolP1, int NPES,\
+ uint8_t *ModeLin, uint8_t *ModeCol, std::vector<MatrixElem> QQ, KForce KFC, double **ZetaXYZ, double *Omega)*/
+double MatrixElement (int NMode, LocalFF LFF,uint32_t IndexEx,int DegrePolP1, int NPES,\
+ uint8_t *ModeLin, uint8_t *ModeCol, std::vector<MatrixElem> QQ, KForce KFC, double **ZetaXYZ, double *Omega)
 {
 /*
+Add unit32_t IndexEx after LFF
+
 Compute <\Phi_Lin | H |\Phi_Col> for Lin = ModeLin and Col = ModeCol 
 (Lin and Col are multi-indexes of length NMode).
 Corresponding force constants are the one associated with index of excitation |Lin-Col| and are located in LFF.
@@ -350,13 +368,13 @@ KFC. KijNCpld[dd][mm] : non coupled force constants, defined for (dd,mm) in [0,D
 KFC.KijCpld[kk] : coupled force constants, defined for kk in [0,NPES[.
 KFC.Monm[kk][mm] = degree of monomial kk for coordinate mm in PES.
 Local force field:
-LFF[xx] : local force field associated with positive excitation DualHPos[xx].
-LFF[xx].Idx[ii] < 0 are indexes of non coupled force constants:
+LFF[ii(xx)] : local force field associated with positive excitation &DualHPos[Idm(xx)].
+LFF.Idx[ii(xx)] are defined for ii [LFF.Num[xx],LFF.Num[xx+1][
+LFF.Idx[ii(xx)] < 0 are indexes of non coupled force constants:
 KFC.KijNCpld[dd][mm] with dd=-LFF.Idx[ii]/NMode, mm=-LFF.Idx[ii]-dd*NMode;
-0 <= LFF[xx].Idx[ii] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF[xx].Idx[ii]].
+0 <= LFF.Idx[ii(xx)] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF.Idx[ii(xx)]].
 LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
 with a unique corresponding (ni,nj,nk,nl)  
-LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[ 
 ZetaXYZ[ijkl]=\sum_{(\alpha ,\beta)\in (x,y,z)} \mu_{\alpha,\beta}\zeta_{ij}^{\alpha}\zeta_{kl}^{\beta}
 Omega : Harmonic force constants in Hartree : used as conversion factor to compute \sqrt{\frac{\nu_j}{\nu_i}},\sqrt{\frac{\nu_p}{\nu_m}}
 in coriolis terms.
@@ -372,8 +390,9 @@ QQ[DegrePol+4].Coeff[ii][jj] are matrix elements of operator D1QQ
   int dd,mm,kk;
   int ni,nj,nk,nl;
 //  
-for (int ii=0; ii<LFF.Num; ii++)
+for(uint32_t ii=LFF.Num[IndexEx]; ii< LFF.Num[IndexEx+1]; ii++)
    {     
+//""
       if(LFF.Idx[ii]<0)
       {
        dd=-LFF.Idx[ii]/NMode;
@@ -408,11 +427,11 @@ for (int ii=0; ii<LFF.Num; ii++)
      return ValMat;
 }
 //
-void FlyRezMVP2(ConfigId *ModeRez, ConfigId *ModeAct,ConfigId *DualHPos, MatrixElem *QQ,\
+void FlyRezMVP2(uint8_t *ModeRez, uint8_t *ModeAct,uint8_t *DualHPos, std::vector<MatrixElem> QQ,\
      uint32_t *Permuter, uint32_t *TabNull, KForce KFC,SizeArray *Size, int NMode,\
      CSC IJRez,uint32_t NXDualHPlus, int DegrePol,\
      int NPES, int Iteration, int NScreen, int *TabScreen, SizeArray SizeMax,\
-     float *RezVect,LocalFF *LFF,double *EigVec, double **ZetaXYZ, double *Omega)
+     float *RezVect,LocalFF LFF,double *EigVec, double **ZetaXYZ, double *Omega)
 {
 /*Complete the matrix vector product Hsb*X for elements (Col,Lin) in (B-A)x(H*(B-A)-B)
  thanks to the graph of residual matrix stored in IJRez. 
@@ -425,13 +444,13 @@ KFC. KijNCpld[dd][mm] : non coupled force constants, defined for (dd,mm) in [0,D
 KFC.KijCpld[kk] : coupled force constants, defined for kk in [0,NPES[.
 KFC.Monm[kk][mm] = degree of monomial kk for coordinate mm in PES.
 Local force field:
-LFF[xx] : local force field associated with positive excitation DualHPos[xx].
-LFF[xx].Idx[ii] < 0 are indexes of non coupled force constants:
+LFF[ii(xx)] : local force field associated with positive excitation &DualHPos[Idm(xx)].
+LFF.Idx[ii(xx)] are defined for ii [LFF.Num[xx],LFF.Num[xx+1][
+LFF.Idx[ii(xx)] < 0 are indexes of non coupled force constants:
 KFC.KijNCpld[dd][mm] with dd=-LFF.Idx[ii]/NMode, mm=-LFF.Idx[ii]-dd*NMode;
-0 <= LFF[xx].Idx[ii] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF[xx].Idx[ii]].
+0 <= LFF.Idx[ii(xx)] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF.Idx[ii(xx)]].
 LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
 with a unique corresponding (ni,nj,nk,nl)  
-LFF[xx].Idx[ii] are defined for ii in [0,LFF[xx].Num[ 
 ZetaXYZ[ijkl]=\sum_{(\alpha ,\beta)\in (x,y,z)} \mu_{\alpha,\beta}\zeta_{ij}^{\alpha}\zeta_{kl}^{\beta}.
 Omega : Harmonic force constants in Hartree : used as conversion factor i.e \sqrt{\frac{\nu_j}{\nu_i}},\sqrt{\frac{\nu_p}{\nu_m}}
 in coriolis terms.
@@ -466,15 +485,37 @@ for (Col=0 ; Col < Size[Iteration].DimAct ; Col++)
   {
  for(int ii=0;ii<NMode;ii++)
    {
- if(ModeAct[Col].Degrees[ii]>=ModeRez[LinRez].Degrees[ii])
-    {Tester[ii]=ModeAct[Col].Degrees[ii]-ModeRez[LinRez].Degrees[ii];}
+//""
+   if(ModeAct[Idm(Col)+ii]>=ModeRez[Idm(LinRez)+ii])
+    {
+//""
+      Tester[ii]=ModeAct[Idm(Col)+ii]-ModeRez[Idm(LinRez)+ii];  
+    }
  else
-    {Tester[ii]=ModeRez[LinRez].Degrees[ii]-ModeAct[Col].Degrees[ii];}
+    {
+//""
+    Tester[ii]=ModeRez[Idm(LinRez)+ii]-ModeAct[Idm(Col)+ii];
+    }
+//
    }
   IndexEx=QsearchMode(Tester, DualHPos,Permuter,NXDualHPlus, NMode);
 //
-  MonomProd=MatrixElement (NMode, LFF[IndexEx] ,DegrePolP1,\
-       NPES, ModeAct[Col].Degrees, ModeRez[LinRez].Degrees, QQ,KFC, ZetaXYZ, Omega);
+//""
+//It must be positiv
+  if(IndexEx<0 || IndexEx > NXDualHPlus)
+   {
+   AfficheNu(&ModeAct[Idm(Col)],NMode);
+   printf("\n");
+   AfficheNu(&ModeRez[Idm(LinRez)],NMode);
+   printf("\n");
+   AfficheNu(Tester, NMode);
+   printf("\n***Error IndexEx : %lu NXDualHPlus : %u, LinRez %u***\n",IndexEx,NXDualHPlus,LinRez); 
+   }
+//exit on nu[1]+2nu[3]+2nu[7]+nu[9]+3nu[11]+nu[12]
+  MonomProd=MatrixElement (NMode, LFF, IndexEx, DegrePolP1,\
+       NPES, &ModeAct[Idm(Col)], &ModeRez[Idm(LinRez)], QQ,KFC, ZetaXYZ, Omega);
+//
+//
 //
         for (int ll=0; ll < NScreen; ll++)
         {  
@@ -524,3 +565,69 @@ Size[Iteration+1].NNZRez=NNNZ;
 //
 delete [] NJTmp;//Works if whole between columns
 }
+
+void VPT2Energy(float *RezVect,const uint64_t DimRez, double *EigVal, uint8_t *ModeRez, int NScreen, int NPES, int DegrePol,\
+ int NMode, int *TabScreen, std::vector<MatrixElem> QQ,  SizeArray SizeMax, LocalFF LFF, double **ZetaXYZ, double *Omega, double *VPTE, KForce KFC)
+{
+/*Return the VPT2 energy thanks to Hss entries from the residual vectors of the target
+according to formula: Delta E = \sum_{s in Bs} (RezVect_s)^2/(E-Hss), RezVect_s is the coordinate s of the residual vector RezVect.
+TabScreen : Indexes of targeted eigen-pairs
+Force constants:
+KFC. KijNCpld[dd][mm] : non coupled force constants, defined for (dd,mm) in [0,DegrePol[x[0,NMode[ (degree dd+1, mode mm<NMode).
+KFC.KijCpld[kk] : coupled force constants, defined for kk in [0,NPES[.
+KFC.Monm[kk][mm] = degree of monomial kk for coordinate mm in PES.
+Local force field:
+LFF[ii(xx)] : local force field associated with positive excitation &DualHPos[Idm(xx)].
+LFF.Idx[ii(xx)] are defined for ii [LFF.Num[xx],LFF.Num[xx+1][
+LFF.Idx[ii(xx)] < 0 are indexes of non coupled force constants:
+KFC.KijNCpld[dd][mm] with dd=-LFF.Idx[ii]/NMode, mm=-LFF.Idx[ii]-dd*NMode;
+0 <= LFF.Idx[ii(xx)] < NPES and are indexes of coupled force constants KFC.KijCpld[LFF.Idx[ii(xx)]].
+LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
+with a unique corresponding (ni,nj,nk,nl)  
+LFF.Idx[ii] >= NPES are key numbers of the rotational coefficients nl*NMode^3+nk*NMode^2+nj*NMode+ni+NPES
+with a unique corresponding (ni,nj,nk,nl)  
+NCPol : maximal number of couplings.
+DegrePol : maximal degree in the PES.
+Omega : harmonic frequencies in hartree for conversion of rotational elements.
+Matrix elements:
+QQ[dd].Coeff[ii][jj] are matrix elements of operator Q^dd for dd in [0,DegrePol],
+QQ[DegrePol+1].Coeff[ii][jj] are matrix elements of operator D2Q (second order derivative)
+QQ[DegrePol+2].Coeff[ii][jj] are matrix elements of operator D1Q (first order derivative)
+QQ[DegrePol+3].Coeff[ii][jj] are matrix elements of operator QD1Q 
+QQ[DegrePol+4].Coeff[ii][jj] are matrix elements of operator D1QQ*/
+double *Rep=new double[NScreen];
+double Hss=0;
+int CheckNNull=0;
+int DegrePolP1=DegrePol+1;
+for(uint64_t cc=0;cc<DimRez;cc++)
+ {
+   CheckNNull=0;
+   for (int ll=0; ll < NScreen; ll++)
+    {
+ Rep[ll]=(double)RezVect[cc+SizeMax.DimRez*ll]*(double)RezVect[cc+SizeMax.DimRez*ll];//First residual vector testify non nullity
+ if(Rep[ll]>=FLT_EPSILON)//Error machine for floating points
+     {
+     CheckNNull=1;//One og them has a non null component
+     }  
+    }
+ if(CheckNNull)
+  {
+//""
+
+  Hss=MatrixElement (NMode, LFF, 0, DegrePolP1, NPES, &ModeRez[Idm(cc)]  , &ModeRez[Idm(cc)]  , QQ,KFC, ZetaXYZ, Omega)\
+  +GetEHarmonic0(&ModeRez[Idm(cc)],NMode,KFC);
+
+
+   for (int ll=0; ll < NScreen; ll++)
+    {     
+      VPTE[ll]+=Rep[ll]/(EigVal[TabScreen[ll]]-Hss);   
+    }  
+  }
+ }
+//
+delete [] Rep;
+//
+}
+
+
+
