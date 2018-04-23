@@ -156,8 +156,8 @@ double *Omega, int NMode);
 //<Phi_m|(\sqrt{\nu_j/\nu_i}Qi*dQj- \sqrt{\nu_i/\nu_j} QjdQi)(\sqrt{\nu_l/\nu_k}Qk*dQl- \sqrt{\nu_k/\nu_l} Ql*dQk)|Phi_n>
 //m_i=n_i +- 1 or 2
 //
-void VPT2Energy(float *RezVect,const uint64_t DimRez, double *EigVal, uint8_t *ModeRez, int NScreen, int NPES, int DegrePol,\
+void CorrectionEnergy(float *RezVect,const uint64_t DimRez, double *EigVal, uint8_t *ModeRez, int NScreen, int NPES, int DegrePol,\
  int NMode, int *TabScreen, std::vector<MatrixElem> QQ,  SizeArray SizeMax, LocalFF LFF, double **ZetaXYZ, double *Omega, double *VPTE, KForce KFC);
-/*Return the VPT2 energy thanks to Hss entries from the residual vectors of the target
+/*Return the correction energies thanks to Hss entries from the residual vectors of the target
 according to formula: Delta E = \sum_{s in Bs} (Ys)^2/(E-Hss), Ys is the coordinate s of the residual vector Y.*/
 #endif

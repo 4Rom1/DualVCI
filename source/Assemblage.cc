@@ -564,10 +564,10 @@ Size[Iteration+1].NNZRez=NNNZ;
 delete [] NJTmp;//Works if whole between columns
 }
 
-void VPT2Energy(float *RezVect,const uint64_t DimRez, double *EigVal, uint8_t *ModeRez, int NScreen, int NPES, int DegrePol,\
+void CorrectionEnergy(float *RezVect,const uint64_t DimRez, double *EigVal, uint8_t *ModeRez, int NScreen, int NPES, int DegrePol,\
  int NMode, int *TabScreen, std::vector<MatrixElem> QQ,  SizeArray SizeMax, LocalFF LFF, double **ZetaXYZ, double *Omega, double *VPTE, KForce KFC)
 {
-/*Return the VPT2 energy thanks to Hss entries from the residual vectors of the target
+/*Return the correction energies thanks to Hss entries from the residual vectors of the target
 according to formula: Delta E = \sum_{s in Bs} (RezVect_s)^2/(E-Hss), RezVect_s is the coordinate s of the residual vector RezVect.
 TabScreen : Indexes of targeted eigen-pairs
 Force constants:

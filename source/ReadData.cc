@@ -180,7 +180,7 @@ int CmptBlank(char *Tab, int taille)
 //
 int GetKeyWords(FILE *file1, int *NMode, int *DoRot, int *MaxEv, int *DeltaNev, int *AddTarget,int *PESType,\
     uint8_t TargetState[MaxTarget][MaxNormal], int *DoGraph, int *MAXNCV,\
-    int *MaxQLevel, int *NAdd, int *MaxAdd, int *PrintOut, int *DoVPT, double *EpsRez, double *KNREZ,\
+    int *MaxQLevel, int *NAdd, int *MaxAdd, int *PrintOut, int *DeltaE, double *EpsRez, double *KNREZ,\
     double *KNNZ, double *KNZREZ, double *EtaComp, double *Tol,double *Kappa, double *ThrMat,double *ThrPES, double *ThrCoor,\
     double *GroundState, double* MinFreq, double *MaxFreq, double *Freq0Max, float *ThrKX, double *Memory,\
     int *Verbose, char *OutName, char *PESName, char* RefName)
@@ -239,8 +239,8 @@ int GetKeyWords(FILE *file1, int *NMode, int *DoRot, int *MaxEv, int *DeltaNev, 
         {sscanf(&chaine[curs], "%d", MaxQLevel);}
         else if (strcasecmp(chainedat,"NAdd")==0)
         {sscanf(&chaine[curs], "%d", NAdd);}
-        else if (strcasecmp(chainedat,"DoVPT")==0)
-        {sscanf(&chaine[curs], "%d", DoVPT);}
+        else if (strcasecmp(chainedat,"DeltaE")==0)
+        {sscanf(&chaine[curs], "%d", DeltaE);}
         else if (strcasecmp(chainedat,"MaxAdd")==0)
         {sscanf(&chaine[curs], "%d", MaxAdd);}
         else if (strcasecmp(chainedat,"Tol")==0)

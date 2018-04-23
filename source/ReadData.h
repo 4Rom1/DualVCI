@@ -50,7 +50,7 @@ and store positions of commas in PoCom*/
 //
 int GetKeyWords(FILE *file1, int *NMode, int *DoRot, int *MaxEv, int *DeltaNev, int *AddTarget,int *PESType,\
     uint8_t TargetState[MaxTarget][MaxNormal], int *DoGraph, int *MAXNCV,\
-    int *MaxQLevel, int *NAdd, int *MaxAdd, int *PrintOut, int *DoVPT, double *EpsRez, double *KNREZ,\
+    int *MaxQLevel, int *NAdd, int *MaxAdd, int *PrintOut, int *DeltaE, double *EpsRez, double *KNREZ,\
     double *KNNZ, double *KNZREZ, double *EtaComp, double *Tol,double *Kappa, double *ThrMat,double *ThrPES, double *ThrCoor,\
     double *GroundState, double* MinFreq, double *MaxFreq, double *Freq0Max, float *ThrKX, double *Memory,\
     int *Verbose, char *OutName, char *PESName, char* RefName);
