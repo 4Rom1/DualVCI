@@ -118,7 +118,7 @@ double Freq0Max=30000;//Frequency wall above groundState
 double KNNZ=0.03;// Shrinking factor for the NNZ of active matrix Hb
 double KNREZ=0.2;//Shrinking factor for residual space size
 double KNZREZ=0.3;//Shrinking factor for residual matrix NNZ
-int DeltaE=0;//If positif add correction vector and correction energy to targets
+int EvalDeltaE=0;//If positif add correction vector and correction energy to targets
 /*
 NXDualHTruncPos : Total number of raising excitations for the dual of H (after truncation through ThrKX)
 NXDualHTrunc : Total number of excitations for the dual of H (after truncation through ThrKX)
@@ -134,7 +134,7 @@ printf("\n*****Reading Datas*****\n");
 //
 int NTargetStates=GetKeyWords(FileKey, &NMode, &DoRot, &MaxEv, &DeltaNev, &AddTarget,\
     &PESType, TargetState, &DoGraph, &MAXNCV,\
-    &MaxQLevel, &NAdd, &MaxAdd, &PrintOut, &DeltaE, &EpsRez, &KNREZ, &KNNZ, &KNZREZ, &EtaComp,\
+    &MaxQLevel, &NAdd, &MaxAdd, &PrintOut, &EvalDeltaE, &EpsRez, &KNREZ, &KNNZ, &KNZREZ, &EtaComp,\
      &Tol, &Kappa, &ThrMat, &ThrPES, &ThrCoor, &GroundState, &MinFreq, &MaxFreq, &Freq0Max, &ThrKX,\
     &Memory, &Verbose, OutName, PESName, RefName);
 //

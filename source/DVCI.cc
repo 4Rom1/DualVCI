@@ -128,14 +128,14 @@ NNZRezMax=SizeActMax*(KNZREZ)*(NXDualHTrunc)
 */
 int DegreCoupl[MaxCpld]={0}; //Maxdegree of PES for each coupling: starts at 0 for coupling 1
 int DoGraph=1; // If not equal to zero, it will store the graph of residual matrix in CSC format
-int DeltaE=0;//If positif add correction vector and correction energy to targets
+int EvalDeltaE=0;//If positif add correction vector and correction energy to targets
 //to gain computational time and then significantly increases memory requirement
 //
 printf("\n*****Reading Datas*****\n");
 //
 int NTargetStates=GetKeyWords(FileKey, &NMode, &DoRot, &MaxEv, &DeltaNev, &AddTarget,\
     &PESType, TargetState, &DoGraph, &MAXNCV,\
-    &MaxQLevel, &NAdd, &MaxAdd, &PrintOut, &DeltaE, &EpsRez, &KNREZ, &KNNZ, &KNZREZ, &EtaComp,\
+    &MaxQLevel, &NAdd, &MaxAdd, &PrintOut, &EvalDeltaE, &EpsRez, &KNREZ, &KNNZ, &KNZREZ, &EtaComp,\
      &Tol, &Kappa, &ThrMat, &ThrPES, &ThrCoor, &GroundState, &MinFreq, &MaxFreq, &Freq0Max, &ThrKX,\
     &Memory, &Verbose, OutName, PESName, RefName);
 //
@@ -196,9 +196,9 @@ per non converged eigenpairs at each iteration, bounded by %d \n",NAdd,MaxAdd);
        {
        printf("\nDoGraph non null means storage of residual graph: more memory, less cpu time\n");
        }
-       if(DeltaE)
+       if(EvalDeltaE)
        {
-       printf("\nDeltaE non null correction of order 2 will be printed out at final stage\n");
+       printf("\nEvalDeltaE non null correction of order 2 will be printed out at final stage\n");
        }
 
 //
@@ -1380,7 +1380,7 @@ double *VPTE=NULL;
 if(ExitSuccess)
  {
  
- if(DeltaE)
+ if(EvalDeltaE)
   {
      VPTE=new double[NScreen];
 //
@@ -1402,7 +1402,7 @@ if(ExitSuccess)
           {
                 printf("\n %d lines detected in Reference file\n",GetValRef(FileRef, TabRef));
           }
-          if(DeltaE)
+          if(EvalDeltaE)
           { 
                 printf("\n Assignment  | Frequency | Relativ |  Correction | Error  || \n");
                 printf(" (Component) | (number)  | Residue |   Energy   | Ref-Here || \n");
@@ -1430,7 +1430,7 @@ if(ExitSuccess)
          SaveZero=PosEig;      
          Ground=EigVal[PosEig];
 /*
-         if(DeltaE)
+         if(EvalDeltaE)
           {
             Ground=EigVal[PosEig]+VPTE[ss];
           }*/
@@ -1445,7 +1445,7 @@ if(ExitSuccess)
            //""                  
            if(PosEig==PosZero)
            {
-           if(DeltaE)
+           if(EvalDeltaE)
             {
            if(!DoRot)
              {
@@ -1475,7 +1475,7 @@ if(ExitSuccess)
            }
            else
            {
-           if(DeltaE)
+           if(EvalDeltaE)
             {
 //           EigVal[PosEig]+=VPTE[ss];
            printf(" | %.2f(%d) | %.4f | %.4f | %.4f // \n \n", \
@@ -1520,7 +1520,7 @@ fclose(FileBasis);
 //
     if(FileRef!=NULL){fclose(FileRef);}
 //
-    if(DeltaE){delete [] VPTE;}
+    if(EvalDeltaE){delete [] VPTE;}
 //
 //""FreeTabMode(ModeAct,SizeActMax)
 

@@ -113,14 +113,14 @@ NNZActMax=SizeActMax*(KNNZ)*(NXDualHTrunc)
 NNZRezMax=SizeActMax*(KNZREZ)*(NXDualHTrunc) 
 */
 int DoGraph=1; // If not equal to zero, it will store the graph of residual matrix in CSC format
-int DeltaE=0;//If positif add correction vector and correction energy to targets
+int EvalDeltaE=0;//If positif add correction vector and correction energy to targets
 //to gain computational time and then significantly increases memory requirement
 //
 printf("\n*****Reading Datas*****\n");
 //
 int NTargetStates=GetKeyWords(FileKey, &NMode, &DoRot, &MaxEv, &DeltaNev, &AddTarget,\
     &PESType, TargetState, &DoGraph, &MAXNCV,\
-    &MaxQLevel, &NAdd, &MaxAdd, &PrintOut, &DeltaE, &EpsRez, &KNREZ, &KNNZ, &KNZREZ, &EtaComp,\
+    &MaxQLevel, &NAdd, &MaxAdd, &PrintOut, &EvalDeltaE, &EpsRez, &KNREZ, &KNNZ, &KNZREZ, &EtaComp,\
      &Tol, &Kappa, &ThrMat, &ThrPES, &ThrCoor, &GroundState, &MinFreq, &MaxFreq, &Freq0Max, &ThrKX,\
     &Memory, &Verbose, OutName, PESName, RefName);
 //
