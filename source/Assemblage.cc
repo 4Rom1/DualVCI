@@ -609,7 +609,7 @@ for(uint64_t cc=0;cc<DimRez;cc++)
  if(Left>=FLT_EPSILON && Right>=FLT_EPSILON)//Error machine for floating points
      {
      Rep[ll]=Left*Right;//First residual vector testify non nullity
-     CheckNNull=1;//One them has a non null component
+     CheckNNull=1;//One of them has a non null component
      }  
     }
  if(CheckNNull)
