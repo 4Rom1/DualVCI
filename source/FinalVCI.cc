@@ -31,6 +31,7 @@
 #include "Solver2.h"
 #include "Generator.h"
 #include <cassert>
+#include <float.h>
 //
 int main(int argc, char *argv[])
 {
@@ -87,7 +88,7 @@ double EtaComp=1.5;//New basis set will be selected from the maximal component
 // of error vector divided by EtaComp*NNotConv, where NNotConv is the number of
 // non converged eigenvectors at a given iteration
 char OutName[MaxChar]="NoName";
-double ThrMat=1e-20; //Threshold for matrix elements
+double ThrMat=DBL_EPSILON; //Threshold for matrix elements
 double ThrCoor=0.6; //Threshold for component selection of targeted vectors
 int AddTarget=2; //Number of additional residual vectors to correct the potential increasing of targets
 char PESName[MaxChar]={0}; //Name of file of PES to be read.
@@ -100,7 +101,7 @@ int PrintOut=0; //If >0 print final basis set and eigenvectors for post treatmen
 double EpsRez=6e-3; //Convergence criteria for global residue
 int Verbose=0;//If > 0 printout additional informations between iterations
 float ThrKX=1; //Threshold for contributions of sum force constants in dual operator
-double ThrPES=1e-20; //Threshold for derivative or force constants of the PES
+double ThrPES=DBL_EPSILON; //Threshold for derivative or force constants of the PES
 double Freq0Max=30000;//Frequency wall above groundState
 double KNNZ=0.03;// Shrinking factor for the NNZ of active matrix Hb
 double KNREZ=0.2;//Shrinking factor for residual space size
@@ -141,8 +142,13 @@ printf("\n PES file name %s \n",PESName);
       MaxQLevel++; //Because < in Matrices
       printf("\n Maximal quantum level for each direction MaxQLevel = %d \n",MaxQLevel-1);
       if(ThrPES >0 && ThrMat>0)
-      {printf("\n Threshold for PES ThrPES = %e,\n Threshold for Hamiltonian matrix elements ThrMat = %e \n", ThrPES, ThrMat);}
-      else{printf("\n Threshold for PES and for Hamiltonian matrix elements have to be > 0 \n");FinalMessaj() return 0;}
+      {
+      //Cannot be under error machine.
+      ThrPES=Max<double>(DBL_EPSILON,ThrPES);
+      ThrMat=Max<double>(DBL_EPSILON,ThrMat);
+      printf("\n Threshold for PES ThrPES = %e,\n Threshold for Hamiltonian matrix elements ThrMat = %e \n", ThrPES, ThrMat);}
+      else{printf("\n Threshold for PES and for Hamiltonian matrix elements have to be > 0 \n");FinalMessaj() return 0;
+      }
 //
       if(NTargetStates)
       {
