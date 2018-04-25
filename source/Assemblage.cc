@@ -597,20 +597,20 @@ double *Rep=new double[NScreen];//Square of residual vector components
 double Hss=0;
 int CheckNNull=0;
 int DegrePolP1=DegrePol+1;
-double FloatComp;//Floating point component of residual vector
+float FloatComp;//Floating point component of residual vector
 for(uint64_t cc=0;cc<DimRez;cc++)
  {
    CheckNNull=0;
    for (int ll=0; ll < NScreen; ll++)
     {
  //Absolute value
- FloatComp=SIGN<double>((double)RezVect[cc+SizeMax.DimRez*ll])*((double)RezVect[cc+SizeMax.DimRez*ll]);
- if(FloatComp>=FLT_EPSILON)//Error machine for floating points
+ FloatComp=RezVect[cc+SizeMax.DimRez*ll];
+ if(FloatComp!=FP_ZERO)//Zero value for floating points
      {
-     Rep[ll]=FloatComp*FloatComp;
+     Rep[ll]=(double)FloatComp*(double)FloatComp;
      CheckNNull=1;//One of them has a non null component
-     }//Avoid spurious values 
- else{Rep[ll]=0;} 
+     }//Avoid spurious values
+ else{Rep[ll]=0.0;}
     }
  if(CheckNNull)
   {
@@ -628,6 +628,8 @@ for(uint64_t cc=0;cc<DimRez;cc++)
 delete [] Rep;
 //
 }
+
+
 
 
 
