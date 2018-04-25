@@ -593,7 +593,7 @@ QQ[DegrePol+1].Coeff[ii][jj] are matrix elements of operator D2Q (second order d
 QQ[DegrePol+2].Coeff[ii][jj] are matrix elements of operator D1Q (first order derivative)
 QQ[DegrePol+3].Coeff[ii][jj] are matrix elements of operator QD1Q 
 QQ[DegrePol+4].Coeff[ii][jj] are matrix elements of operator D1QQ*/
-double *Rep=new double[NScreen];
+double *Rep=new double[NScreen];//Square of residual vector components
 double Hss=0;
 int CheckNNull=0;
 int DegrePolP1=DegrePol+1;
@@ -609,7 +609,8 @@ for(uint64_t cc=0;cc<DimRez;cc++)
      {
      Rep[ll]=FloatComp*FloatComp;
      CheckNNull=1;//One of them has a non null component
-     }  
+     }//Avoid spurious values 
+ else{Rep[ll]=0;} 
     }
  if(CheckNNull)
   {
