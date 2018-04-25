@@ -597,25 +597,27 @@ double *Rep=new double[NScreen];
 double Hss=0;
 int CheckNNull=0;
 int DegrePolP1=DegrePol+1;
+double Left;
+double Right;
 for(uint64_t cc=0;cc<DimRez;cc++)
  {
    CheckNNull=0;
    for (int ll=0; ll < NScreen; ll++)
     {
- Rep[ll]=(double)RezVect[cc+SizeMax.DimRez*ll]*(double)RezVect[cc+SizeMax.DimRez*ll];//First residual vector testify non nullity
- if(Rep[ll]>=FLT_EPSILON)//Error machine for floating points
+ Left=(double)RezVect[cc+SizeMax.DimRez*ll];
+ Right=(double)RezVect[cc+SizeMax.DimRez*ll];
+ if(Left>=FLT_EPSILON && Right>=FLT_EPSILON)//Error machine for floating points
      {
-     CheckNNull=1;//One og them has a non null component
+     Rep[ll]=Left*Right;//First residual vector testify non nullity
+     CheckNNull=1;//One them has a non null component
      }  
     }
  if(CheckNNull)
   {
 //""
-
   Hss=MatrixElement (NMode, LFF, 0, DegrePolP1, NPES, &ModeRez[Idm(cc)]  , &ModeRez[Idm(cc)]  , QQ,KFC, ZetaXYZ, Omega)\
   +GetEHarmonic0(&ModeRez[Idm(cc)],NMode,KFC);
-
-
+//
    for (int ll=0; ll < NScreen; ll++)
     {     
       VPTE[ll]+=Rep[ll]/(EigVal[TabScreen[ll]]-Hss);   
