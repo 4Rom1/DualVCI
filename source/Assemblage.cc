@@ -603,7 +603,6 @@ for(uint64_t cc=0;cc<DimRez;cc++)
    CheckNNull=0;
    for (int ll=0; ll < NScreen; ll++)
     {
- //Absolute value
  FloatComp=RezVect[cc+SizeMax.DimRez*ll];
  if(FloatComp!=FP_ZERO)//Zero value for floating points
      {
@@ -628,8 +627,3 @@ for(uint64_t cc=0;cc<DimRez;cc++)
 delete [] Rep;
 //
 }
-
-
-
-
-

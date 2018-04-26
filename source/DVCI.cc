@@ -1301,7 +1301,7 @@ NEV=Min<int>(MaxEv,MaxScreen+DeltaNev);
           {printf("Maximal component of error vector divided by EtaComp*NNotConv %f \n", MaxComp);}
 //
          NAddIter=NAdd*(Iteration+1);
-                  
+//                  
          if(Size[Iteration+1].DimAct<SizeActMax)
           {
           MaxAddVar=Min<int>(MaxAdd,SizeActMax-Size[Iteration+1].DimAct);
@@ -1384,6 +1384,7 @@ if(ExitSuccess)
   {
      VPTE=new double[NScreen];
 //
+     printf("\n****Starting computation of correction energies****\n");
      gettimeofday(&begin,NULL);
 //
      InitTabInt(VPTE,NScreen)
