@@ -397,13 +397,13 @@ for (int mm=0; mm<  NMode ; mm ++)
     {
      Omega[mm]=pow(KijNCpld[1][mm],1.0/4.0);
      printf(" \\nu_{%d} : %.1f cm-1, ",mm+1,pow(Omega[mm],2)*HA_TO_CM);
-     Pid[mm]=Min<uint32_t>((uint32_t)ceil(Freq0Max/(pow(Omega[mm],2)*HA_TO_CM))+1,MaxQLevel);
+     Pid[mm]=Min<uint32_t>((uint32_t)ceil(Freq0Max/(pow(Omega[mm],2)*HA_TO_CM)),MaxQLevel);
     }
     else
     {
      Omega[mm]=2*KijNCpld[1][mm];
      printf(" \\nu_{%d} : %.1f cm-1, ",mm+1,Omega[mm]);
-     Pid[mm]=Min<uint32_t>((uint32_t)ceil(Freq0Max/Omega[mm])+1,MaxQLevel);  
+     Pid[mm]=Min<uint32_t>((uint32_t)ceil(Freq0Max/Omega[mm]),MaxQLevel);  
      Omega[mm]=sqrt(Omega[mm]/HA_TO_CM);//Inverse conversion for Coriolis terms
     }
     if( ( (mm+1)%3==0) && (mm>0))

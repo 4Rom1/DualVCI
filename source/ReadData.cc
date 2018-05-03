@@ -831,7 +831,7 @@ ThrPES : threshold for acceptable force constants.*/
 long GetNumKijCpld0(FILE *file, int NMode, double ThrPES, int *NCPol, int *DegrePol, int DegreCoupl[MaxCpld])
 {
 //Get the number of force constants in PES file for PESType=0  
-//Maximal degrees per couplings are saved in DegreCoupl
+//Maximal degrees per couplings are saved in DegreCoupl (Sum)
 //DegreCoupl[0] corresponds to 1 mode coupling terms.
 //Maximal degrees and couplings are respectively returned in DegrePol and NCPol
 //ThrPES : threshold for acceptable force constants.

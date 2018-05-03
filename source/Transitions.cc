@@ -35,6 +35,7 @@
 #include <limits.h>
 #include <vector>
 #include <float.h>
+#include <algorithm> 
 //
 #define IncK2 1
 //IncK2:Say if the the quadratic term should be included or not in the local force field,
@@ -360,13 +361,13 @@ for (int mm=0; mm<  NMode ; mm ++)
     {
      Omega[mm]=pow(KijNCpld[1][mm],1.0/4.0);
      printf(" \\nu_{%d} : %.1f cm-1, ",mm+1,pow(Omega[mm],2)*HA_TO_CM);
-     Pid[mm]=Min<uint32_t>((uint32_t)ceil(Freq0Max/(pow(Omega[mm],2)*HA_TO_CM))+1,MaxQLevel);
+     Pid[mm]=Min<uint32_t>((uint32_t)ceil(Freq0Max/(pow(Omega[mm],2)*HA_TO_CM)),MaxQLevel);
     }
     else
     {
      Omega[mm]=2*KijNCpld[1][mm];
      printf(" \\nu_{%d} : %.1f cm-1, ",mm+1,Omega[mm]);
-     Pid[mm]=Min<uint32_t>((uint32_t)ceil(Freq0Max/Omega[mm])+1,MaxQLevel);  
+     Pid[mm]=Min<uint32_t>((uint32_t)ceil(Freq0Max/Omega[mm]),MaxQLevel);  
      Omega[mm]=sqrt(Omega[mm]/HA_TO_CM);//Inverse conversion for Coriolis terms
     }
     if( ( (mm+1)%3==0) && (mm>0))
@@ -408,26 +409,89 @@ printf("%u]\n",Pid[NMode-1]-1);
 //
 if(PrintOut >2)
 {
-uint8_t MultiDegrees[MaxNormal]={0};
-uint64_t SizePrun=0;
-
 printf("\n***Compute size of pruned basis set \n");
-
-int NMillion=0;
- do 
-  {    
-   if(GetFreq0(MultiDegrees,NMode, KFC)<Freq0Max)
+int NMillion=1;
+uint8_t MultiDegrees[MaxNormal]={0};
+uint8_t MultiSurf[MaxNormal]={0};
+uint8_t MaxDegrees[MaxNormal]={0};
+uint8_t MaxDegSurf[MaxNormal]={0};
+//uint8_t Tester[MaxNormal]={0};
+uint64_t SizePrun=0;
+double SubFreq=0;
+double ffreq=0;
+//
+double AdjustFreq; 
+int ss;
+//
+for (int NEccit=1;NEccit<=NMode;NEccit++)
+ {
+ for (int dd=0; dd< NEccit; dd++)
+   {
+  MaxDegSurf[dd]=1;
+   }
+//
+ for (int dd=NEccit; dd< NMode; dd++)
+   {
+  MaxDegSurf[dd]=0;
+   }
+//
+//
+//Combination i<j<k<l...
+//Surface i<j<l<m... until NEccit ={ MultiSurf[ss], 0<=ss<NEccit }
+//Given by the indexes xx of MaxDegSurf[xx]!=0
+//MultiSurf[ss]<NMode contains the indexes of surface for 0<=ss<NEccit
+//MaxDegrees[ss] will be the maximal degree of modal excitation on coordinate MultiSurf[ss]
+printf("\n------------%d-Modes couplings surface-------------\n",NEccit);
+do{
+  SubFreq=0;
+//  InitTabInt(Tester, NMode)  
+    for (int mm=0; mm< NMode; mm++)
     {
-  SizePrun++;
-  if(!(SizePrun % (int)1e6))
+   if(MaxDegSurf[mm])
      {
-  printf("%i million\n",NMillion);
-     NMillion++;
+     SubFreq+=KFC.KijNCpld[1][mm];
      }
     }
-  } while(nested_loop(MultiDegrees, Pid, NMode));
+  ss=0;  
+  AdjustFreq=Freq0Max-SubFreq;
+  if(AdjustFreq>=0)
+  {    
+  for (int mm=0; mm< NMode; mm++)
+    {
+   if(MaxDegSurf[mm])
+     {
+//Freq0Max-SubFreq+KFC.KijNCpld[1][mm] explains the +2 yes but if 0.5 maximal 1 can be included
+   MaxDegrees[ss]=Min<int>((int)ceil((AdjustFreq)/KFC.KijNCpld[1][mm])+1,MaxQLevel);
+//printf("Pid[%d]:%d,",mm+1,MaxDegrees[ss]);  
+   MultiDegrees[ss]=1;
+   MultiSurf[ss]=mm;
+   ss++;
+     }
+    }
+//   
+// printf("\n");
+   do{    
+//Sum_ee Multidegrees[ee] is all the possible sum of NEccit uplets lower than MaxDegrees+1.
+    ffreq=0;
+    for (int ee=0;ee<NEccit;ee++)
+     {
+    ffreq+=MultiDegrees[ee]*KFC.KijNCpld[1][MultiSurf[ee]];
+     }    
+   if(ffreq<Freq0Max)
+      {   
+      SizePrun++;
+        if(!(SizePrun % (int)1e6))
+        {
+     printf("%i millions\n",NMillion);
+     NMillion++;
+        }
+       }  
+     }while(nested_loop1(MultiDegrees, MaxDegrees, NEccit));  
+    }//Adjust freq need to be positif 
+  }while(std::prev_permutation(MaxDegSurf, MaxDegSurf+NMode));
+}
 //
-printf("***The size is %lu***\n\n",SizePrun);
+printf("\n\n***The size is %lu***\n\n",SizePrun+1);//Do not forget 0
 FinalMessaj() return 0;
 }
 

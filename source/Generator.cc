@@ -182,7 +182,7 @@ do{
    if(MaxDegSurf[mm])
      {
    MultiSurf[ss]=mm;
-   MaxDegrees[ss]=MaxDeg+1;
+   MaxDegrees[ss]=MaxDeg-NEccit+2;//Must take into account the others 1 (MaxDeg+1-(NEccit-1))
    MultiDegrees[ss]=1;
    ss++;
      }
