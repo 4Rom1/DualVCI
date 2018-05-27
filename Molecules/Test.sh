@@ -99,8 +99,21 @@ echo "18th test : Water"
 echo "############"
 #Fail on Ground state.
 ../../source/DVCI H2O_FailG.in
+wait
 #Simple fundamentals calculation.
 ../../source/DVCI H2O_Key.in
+wait
+#Fundamentals + VPT
+../../source/DVCI H2O_VPT-Fund.in
+wait
+#All infrared spectra + VPT
+../../source/DVCI H2O_AllIR-VPT.in
+wait
+#All infrared spectra + VPT + NoGraph
+../../source/DVCI H2O_AllIR-VPT_NoGraph.in
+wait
+#All infrared spectra + VPT + NoRot
+../../source/DVCI H2O_AllIR-VPT_NoRot.in
 wait
 echo "############"
 echo "19th test : Water transitions"
@@ -121,12 +134,18 @@ wait
 ../../source/DVCI H2O_Fail1.in
 wait
 ../../source/Transitions H2O_Fail1.in
+wait
+#All infrared spectra + VPT + NoGraph
+../../source/DVCI H2O_AllIR-VPT_NoGraph.in
+wait
+#Transitions + NoGraph
+../../source/Transitions H2O_AllIR-VPT_NoGraph.in
 echo "############"
 echo "20th test : Water FinalVCI"
 echo "############"
 ../../source/DVCI H2O_Fund.in
 wait
-../../source/FinalVCI H2O_Targ.in
+../../source/FinalVCI H2O_Fund.in
 wait #DVCI should be re-run before
 ../../source/DVCI H2O_AllIR2.in
 wait
@@ -143,3 +162,10 @@ wait #No Rotational terms
 ../../source/DVCI H2O_AllIRNoRot.in
 wait
 ../../source/FinalVCI H2O_AllIRNoRot.in
+echo "############"
+echo "21th test : C2H4"
+echo "############"
+wait
+cd ../C2H4
+wait
+../../source/DVCI C2H4_0.in

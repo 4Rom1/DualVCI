@@ -2,7 +2,10 @@
 # $ ./TestMemCheck.sh > MemCheck.txt 2>&1
 # The command 
 # $ grep "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" MemCheck.txt | wc -l
-# should return 26
+# should return 32
+#Need to test words returned by erros in Valgrind such as 
+#grep "Conditional" MemCheck.txt
+#grep "Invalid" MemCheck.txt
 cd N2H2
 echo "############"
 echo "First test with wrong input file"
@@ -72,6 +75,19 @@ cd ../H2O
 echo "############"
 echo "14th test : Water"
 echo "############"
+#Fundamentals + VPT
+valgrind --leak-check=full ../../source/DVCI H2O_VPT-Fund.in
+wait
+#All infrared spectra + VPT
+valgrind --leak-check=full ../../source/DVCI H2O_AllIR-VPT.in
+wait
+#All infrared spectra + VPT + NoGraph
+valgrind --leak-check=full ../../source/DVCI H2O_AllIR-VPT_NoGraph.in
+wait
+#All infrared spectra + VPT + NoRot
+valgrind --leak-check=full../../source/DVCI H2O_AllIR-VPT_NoRot.in
+wait
+#Simple fundamentals
 valgrind --leak-check=full ../../source/DVCI H2O_Key.in
 wait
 echo "############"
@@ -89,12 +105,17 @@ wait #DVCI should be re-run before
 valgrind --leak-check=full ../../source/DVCI H2O_Target.in
 wait
 valgrind --leak-check=full ../../source/Transitions H2O_Target.in
+#All infrared spectra + VPT + NoGraph
+valgrind --leak-check=full ../../source/DVCI H2O_AllIR-VPT_NoGraph.in
+wait
+#Transitions + NoGraph
+valgrind --leak-check=full ../../source/Transitions H2O_AllIR-VPT_NoGraph.in
 echo "############"
 echo "20th test : Water FinalVCI"
 echo "############"
 valgrind --leak-check=full ../../source/DVCI H2O_Fund.in
 wait
-valgrind --leak-check=full ../../source/FinalVCI H2O_Targ.in
+valgrind --leak-check=full ../../source/FinalVCI H2O_Fund.in
 wait #DVCI should be re-run before
 ../../source/DVCI H2O_AllIR2.in
 wait
@@ -104,6 +125,6 @@ valgrind --leak-check=full ../../source/DVCI H2O_Target2.in
 wait
 valgrind --leak-check=full ../../source/FinalVCI H2O_Target2.in
 wait #DVCI should be re-run before
-valgrind --leak-check=full ../../source/DVCI AllIRNoRot.in
+valgrind --leak-check=full ../../source/DVCI H2O_AllIRNoRot.in
 wait
-valgrind --leak-check=full ../../source/FinalVCI AllIRNoRot.in
+valgrind --leak-check=full ../../source/FinalVCI H2O_AllIRNoRot.in
