@@ -88,7 +88,7 @@ Execution:
   the vectors components. 
  Then the module Transitions allows to get the transition moments <Psi_0 |Op|Psi_n> where
   Op is an operator having the same format as the PES and Phi_n are wave functions of
-  targets previously computed with DVCI (Psi_0 is the ground state).
+  the targets previously computed with DVCI (Psi_0 is the ground state).
  To run Transitions:
  $ Transitions INPUT-Op.in
   Where Input-Op.in should be the same file as Input.in except that PESName needs to be changed
