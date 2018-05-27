@@ -460,9 +460,9 @@ do{
     {
    if(MaxDegSurf[mm])
      {
-//Freq0Max-SubFreq+KFC.KijNCpld[1][mm] explains the +2 yes but if 0.5 maximal 1 can be included
+//ceil(Freq0Max-SubFreq+KFC.KijNCpld[1][mm])/KFC.KijNCpld[1][mm] because 
+//starts at 1 and strictly inferior : Maxn=Maxn+1
    MaxDegrees[ss]=Min<int>((int)ceil((AdjustFreq)/KFC.KijNCpld[1][mm])+1,MaxQLevel);
-//printf("Pid[%d]:%d,",mm+1,MaxDegrees[ss]);  
    MultiDegrees[ss]=1;
    MultiSurf[ss]=mm;
    ss++;
