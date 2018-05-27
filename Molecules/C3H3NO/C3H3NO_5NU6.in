@@ -9,7 +9,7 @@ DoRot 2
 MaxEv 800
 Verbose 1
 GroundState 12559.9032
-TargetState 5(6)
+TargetState 6(6)
 ThrKX 1
 Freq0Max 120000
 KNNZ 0.0001
