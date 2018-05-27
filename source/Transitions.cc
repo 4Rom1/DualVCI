@@ -460,8 +460,12 @@ do{
     {
    if(MaxDegSurf[mm])
      {
+<<<<<<< HEAD
 //ceil(Freq0Max-SubFreq+KFC.KijNCpld[1][mm])/KFC.KijNCpld[1][mm] because 
 //starts at 1 and strictly inferior : Maxn=Maxn+1
+=======
+//Freq0Max-SubFreq+KFC.KijNCpld[1][mm] starts at 1 and strictly inferior : Maxn=Maxn+1
+>>>>>>> a7215b6648538685e47a1ebd6f4be14b69dfeca4
    MaxDegrees[ss]=Min<int>((int)ceil((AdjustFreq)/KFC.KijNCpld[1][mm])+1,MaxQLevel);
    MultiDegrees[ss]=1;
    MultiSurf[ss]=mm;
