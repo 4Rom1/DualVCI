@@ -98,9 +98,6 @@ Execution:
   -Matrix.bin to re-run the last diagonalization in the final basis set.
  To do so, you just need to use exactly the same input as DVCI and hit 
  $ FinalVCI INPUT.in
- 
- Contiguous allocation has been enhanced in the recent version then you'll see a gain
-  of memory of about 15% compared to the values announced in the manual.  
 
 ---------------------------------------------------------------------------------------
 
