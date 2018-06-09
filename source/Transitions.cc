@@ -252,6 +252,14 @@ printf("\n***PrintOut must be equal to 1 and basis set saved from previous DVCI 
 FinalMessaj()
 return 0;
 }
+
+if(PrintOut==2)
+{
+printf("\n***PrintOut must be equal to 1 and basis set saved from previous DVCI run*** \n\n");
+FinalMessaj()
+return 0;
+}
+
       if(Memory<=0)
        {
            printf("****Need to indicate a positive value of Memory in megabytes****\n\n");
