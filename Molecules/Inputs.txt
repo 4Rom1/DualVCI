@@ -1,10 +1,10 @@
 *********************
 
     Dual Vibration Configuration Interaction (DVCI).
-    A novel factorisation of molecular Hamiltonian for
-    high performance infrared spectrum computation, 
+    An efficient factorisation of molecular Hamiltonian for
+    high performance infrared spectrum computation. 
     Romain Garnier <rom1{dot}garnier{at}yahoo{dot}fr>,
-    submitted in 2017.
+    submitted in 2018.
 
     List of inputs for molecules : N2H2,CH3CN,C2H4,C2H4O,C3H3NO. 
  
@@ -30,33 +30,67 @@ EpsRez 0.009           / Maximal allowed Residue
 ThrKX 1                / Threshold for constants in dual operator
 @@@@@@@@@@@@@@@@@@@@@@@
 ---------------------
-Input file of C2H4
+Input files of C2H4
 ----------------------
 NMode 12                                
-PESType 1              
+PESType 0              
 OutName C2H4_F           
-PESName C2H4_PES.in    
-Memory 700
+PESName C2H4_PES0.in    
+Memory 400
 DoRot 1 
 EtaComp 2
-NAdd 100
+NAdd 80
 MaxEv 90 
-ThrCoor 0.4
-RefName C2H4_Ref.txt
+/MaxEv 100
+ThrCoor 0.65
+RefName C2H4_RefPyVCI.txt
 TargetState Fund
-MaxAdd 10000            /Limit number of basis function to add at each iteration
+MaxAdd 10000            
 Verbose 1
-KNRez 0.14
-KNNZ 0.015
-KNZREZ 0.13
-EpsRez 0.0065
-Freq0Max 30000
-AddTarget 1
-Freq0Max 30000
+KNRez 0.09
+KNNZ 0.012
+KNZREZ 0.1
+EpsRez 0.0068
+AddTarget 0
+Freq0Max 24000
 MAXNCV 130
-DeltaNEV 15
-/DoGraph 0
-AddTarget 1
+ThrPES 1e-15
+AddTarget 0
+MaxQlevel 10
+ThrMat 1e-15
+DeltaNEV 10
+EvalDeltaE 1
+----------------------
+C2H4 : Target 2nu[1]+n[6]
+----------------------
+NMode 12                                
+PESType 0              
+OutName C2H4_F           
+PESName C2H4_PES0.in    
+Memory 85
+DoRot 1 
+EtaComp 2
+NAdd 200
+MaxEv 90 
+ThrCoor 0.65
+RefName C2H4_RefPyVCI.txt
+GroundState 11017.09
+TargetState 2(1), 1(6)
+MaxAdd 10000           
+Verbose 1
+KNRez 0.09
+KNNZ 0.0102
+KNZREZ 0.104
+EpsRez 0.0075
+AddTarget 0
+Freq0Max 24000
+MAXNCV 130
+ThrPES 1e-15
+AddTarget 0
+MaxQlevel 10
+ThrMat 1e-15
+DeltaNEV 10
+EvalDeltaE 1
 @@@@@@@@@@@@@@@@@@@@@
 ---------------------
 Input file of CH3CN
@@ -81,6 +115,7 @@ ThrCoor 0.4
 ThrKX 1e-15
 AddTarget 4
 TargetState Fund
+EvalDeltaE 1
 @@@@@@@@@@@@@@@@@@@@@@
 ---------------------
 Input file of C2H4O
@@ -121,6 +156,7 @@ KNREZ 0.2
 KNNZ 0.016
 KNZREZ 0.25
 AddTarget 0
+EvalDeltaE 1
 @@@@@@@@@@@@@@@@@@@@@
 ---------------------
 Input file of C2H4O
@@ -147,6 +183,7 @@ KNREZ 0.14
 KNNZ 0.024
 KNZREZ 0.25
 AddTarget 1
+EvalDeltaE 1
 @@@@@@@@@@@@@@@@@@@@@
 ---------------------
 Input file of C2H4O
@@ -171,8 +208,9 @@ Freq0Max 30000
 MaxAdd 30000
 KNREZ 0.15
 KNNZ 0.024
-KNZREZ 0.24
+KNZREZ 0.245
 AddTarget 2
+EvalDeltaE 1
 @@@@@@@@@@@@@@@@@@@@@
 ---------------------
 Input file of C2H4O
@@ -199,6 +237,7 @@ KNREZ 0.15
 KNNZ 0.024
 KNZREZ 0.24
 AddTarget 1
+EvalDeltaE 1
 @@@@@@@@@@@@@@@@@@@@@
 ---------------------
 Input file of C2H4O
@@ -225,6 +264,7 @@ KNREZ 0.15
 KNNZ 0.024
 KNZREZ 0.24
 AddTarget 1
+EvalDeltaE 1
 @@@@@@@@@@@@@@@@@@@@@
 ---------------------
 Input file of C3H3NO
@@ -301,3 +341,56 @@ KNZREZ 0.17
 DeltaNEV 30
 Tol 1e-6
 MAXNCV 1000
+#################################
+#################################
+PyVCI_VPT2 inputs for C2H4
+#################################
+#################################
+-----------------------
+Reference space VCI(8)
+-----------------------
+  MOLECULE         C2H4
+  PESN             3
+  DLVL             6
+# FF_MR            4
+  EXC_LVL          8
+# VCI_MC           6
+  VCI_VPT2_ETHRESH 1e-08
+  VCI_VPT2_NITER   15
+  ITER_APPROX_DIAG -1
+  DO_VIB           False
+  DO_COR           True
+  SPECTRUM_RANGE   4000.0
+  FC_TOL           1e-15
+  MAT_ELEMS_TOL    1e-15
+  VCI_BACKUP_FR    0.25
+  N_PROCESS        0
+  DO_BACKUP        True
+  VCI_MAT_FILE     C2H4-VPT2
+  VCI_PATH         /PathToYourDirectory
+  VCI_RESTART      False
+  PRINT_DERIV      False
+-----------------------
+Reference space VCI(10)
+-----------------------
+  MOLECULE         C2H4
+  PESN             3
+  DLVL             6
+# FF_MR            4
+  EXC_LVL          10
+# VCI_MC           6
+  VCI_VPT2_ETHRESH 1e-08
+  VCI_VPT2_NITER   15
+  ITER_APPROX_DIAG -1
+  DO_VIB           False
+  DO_COR           True
+  SPECTRUM_RANGE   4000.0
+  FC_TOL           1e-15
+  MAT_ELEMS_TOL    1e-15
+  VCI_BACKUP_FR    0.25
+  N_PROCESS        0
+  DO_BACKUP        True
+  VCI_MAT_FILE     C2H4-VPT2
+  VCI_PATH         /PathToYourDirectory
+  VCI_RESTART      False
+  PRINT_DERIV      False
