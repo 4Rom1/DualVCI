@@ -46,10 +46,12 @@ int main(int argc, char *argv[])
 //
 PrintBanner ("--dvci--");
 //
-printf("Dual vibration configuration interaction (DVCI)\n\
-A novel factorisation of molecular Hamiltonian for\n\
+printf("Romain Garnier,\n\
+Dual vibration configuration interaction (DVCI).\n\
+An efficient factorisation of molecular Hamiltonian for\n\
 high performance infrared spectrum computation,\n\
-Romain Garnier, submitted in 2018.\n");
+Computer Physics Communications, 2018,\n\
+https://doi.org/10.1016/j.cpc.2018.07.008\n");
 //
      if(argc != 2)
      { 
