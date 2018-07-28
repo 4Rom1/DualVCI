@@ -59,7 +59,7 @@ Dual vibration configuration interaction (DVCI).\n\
 An efficient factorisation of molecular Hamiltonian for\n\
 high performance infrared spectrum computation,\n\
 Computer Physics Communications, 2018,\n\
-https://doi.org/10.1016/j.cpc.2018.07.008.\n");
+https://doi.org/10.1016/j.cpc.2018.07.008\n");
 //
      if(argc != 2)
      { 
