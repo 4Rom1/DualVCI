@@ -27,8 +27,13 @@ Function :
  Compute targeted vibrational spectrum of a wide range of molecules with a very good precision.
  The resources to be allocated directly depend on the number of nucleus 
  and the number of terms of the potential energy surface that should be provided. 
- The algorithm saves memory and computational time with a new factorization described 
- in the user manual named "DVCI_Manual.pdf".
+ The algorithm saves memory and computational time with a new factorization described in
+
+  Dual vibration configuration interaction (DVCI). 
+  An efficient factorisation of molecular Hamiltonian for
+  high performance infrared spectrum computation,
+  Computer Physics Communications, 2018,
+  https://doi.org/10.1016/j.cpc.2018.07.008
  
 ------------------------------------------------------------------------
 
