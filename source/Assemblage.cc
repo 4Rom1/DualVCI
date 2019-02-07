@@ -604,7 +604,7 @@ for(uint64_t cc=0;cc<DimRez;cc++)
    for (int ll=0; ll < NScreen; ll++)
     {
  FloatComp=RezVect[cc+SizeMax.DimRez*ll];
- if(FloatComp!=FP_ZERO)//Zero value for floating points
+ if(FloatComp!=0.0)//Zero value for floating points
      {
      Rep[ll]=(double)FloatComp*(double)FloatComp;
      CheckNNull=1;//One of them has a non null component
