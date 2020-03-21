@@ -10,21 +10,21 @@
 
 -------------------------------------------------------------------------
 
-    Dual Vibration Configuration Interaction (DVCI).
+##Dual Vibration Configuration Interaction (DVCI).
         
 -------------------------------------------------------------------------
 
-Author: 
- Romain Garnier <rom1{dot}garnier{at}yahoo{dot}fr>.
+#####Author: 
+Romain Garnier <rom1{dot}garnier{at}yahoo{dot}fr>.
 
-Licensing provisions: 
- GPL v3 or later. See <https://www.gnu.org/licenses/>.
+#####Licensing provisions: 
+GPL v3 or later. See <https://www.gnu.org/licenses/>.
     
-Updated sources can be found at
- https://github.com/4Rom1/DualVCI 
+#####Updated sources can be found at
+https://github.com/4Rom1/DualVCI 
 
-Function :
- Compute targeted vibrational spectrum of a wide range of molecules with a very good precision.
+#####Function :
+Compute targeted vibrational spectrum of a wide range of molecules with a very good precision.
  The resources to be allocated directly depend on the number of nucleus 
  and the number of terms of the potential energy surface that should be provided. 
  The algorithm saves memory and computational time with a new factorization described in
@@ -34,14 +34,18 @@ Function :
   high performance infrared spectrum computation,
   Computer Physics Communications, 2018,
   https://doi.org/10.1016/j.cpc.2018.07.008
+
+More generally the factorization presented in the paper can be applied to any polynomial operator 
+including derivative terms (e.g Coriolis terms) such as dipole moment, 
+an example of implementation is given within the module Transition (see under).
  
 ------------------------------------------------------------------------
 
-Languages:
+#####Languages:
  The code is written in C/C++ and uses ARPACK[6] and LAPACK[7]
  Fortran libraries (provided with the source files).
 
-Required material:
+#####Required material:
  This version of the program runs on a Linux machine.
  It should be compiled using gcc compiler,
  but it is possible to change it (e.g with intel compiler).
@@ -50,10 +54,10 @@ Required material:
 
 ------------------------------------------------------------------------
 
-Installation:
+#####Installation:
 
  To install it, unzip the DualVCI.zip, open a terminal and tape 
- $ ./INSTALL
+ *$ ./INSTALL*
 
  For a second installation on the same or an other machine, you need to go into the sub directory 
  ARPACK, open the file ARmake.inc and be sure that home directory writes "home = MyDir".
@@ -61,7 +65,7 @@ Installation:
  and then overwritten by your current directory after you launch the command ./INSTALL. 
 
  If the installation is not running then make the installation file executable by typing 
- $ sudo chmod 777 INSTALL.
+ *$ sudo chmod 777 INSTALL*
 
  During the installation a link between the command DVCI and 
  the executable is created in ~/.bashrc.
@@ -72,41 +76,42 @@ Installation:
 
 ----------------------------------------------------------------------------------
 
-Execution:
+#####Execution:
 
  The program runs on a terminal with the command 
- $ DVCI INPUT.in  
+ *$ DVCI INPUT.in*  
  Or if for several applications you need to include the path of the executable 
- $ MyDir/DualVCI/source/DVCI INPUT.in  
+ *$ MyDir/DualVCI/source/DVCI INPUT.in*  
  where INPUT.in contains the different keywords discussed in the user manual (DVCI_Manual.pdf).
  If DVCI command is not recognized on your terminal, 
  then the bashrc file needs to be sourced with command 
- $ source ~/.bashrc
+ *$ source ~/.bashrc*
 
  The directory where is executed DVCI should also contain the potential energy file
  as explained in the user manual.
 
  The informations of the frequencies, residues, assignment and CPU time will
  be displayed in output. Additionally you'll see 2 other files with respective extension 
- -FinalBasis.in, -Vectors.bin (if Printout=1).
+ *-FinalBasis.in*, *-Vectors.bin* (if Printout=1).
  The first one print all configurations of final basis set and the second one 
   the vectors components. 
- Then the module Transitions allows to get the transition moments <Psi_0 |Op|Psi_n> where
+
+ Then the module **Transitions** allows to get the transition moments <Psi_0 |Op|Psi_n> where
   Op is an operator having the same format as the PES and Phi_n are wave functions of
   the targets previously computed with DVCI (Psi_0 is the ground state).
  To run Transitions:
- $ Transitions INPUT-Op.in
+ *$ Transitions INPUT-Op.in*
   Where Input-Op.in should be the same file as Input.in except that PESName needs to be changed
   with the name of the file containing the operator Op 
   (one can also take the same PES name to do some verification as in the unitary tests). 
  If PrintOut=2 the matrix of the last iteration will be saved in binary format with extension
   -Matrix.bin to re-run the last diagonalization in the final basis set.
  To do so, you just need to use exactly the same input as DVCI and hit 
- $ FinalVCI INPUT.in
+ *$ FinalVCI INPUT.in*
 
 ---------------------------------------------------------------------------------------
 
-Test cases:
+#####Test cases:
 
  If you go to the directory Molecules, you'll see subdirectories with different names of molecule.
  Each one of these directories contains necessary files to run directly. 
@@ -132,7 +137,7 @@ Test cases:
 
  A converter script written in python is provided with the original files.
  To run it tape 
- $./Convert.py oxazole_pes.mop 18
+ *$./Convert.py oxazole_pes.mop 18*
 
  Unit tests are now available in directory Molecules with the 2 shell scripts 
  Test.sh and TestMemCheck.sh.
@@ -141,7 +146,7 @@ Test cases:
  
 ---------------------------------------------------------------------------------------
 
-Source files
+#####Source files
 
  The source files (+ corresponding headers) are the following:
 
