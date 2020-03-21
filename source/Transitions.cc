@@ -326,8 +326,6 @@ per non converged eigenpairs at each iteration, bounded by %d \n",
   if (DoRot) {
     printf("\n *** Coordinates, masses and equilibrium geometry readed *** \n");
   }
-  // DoRot must be set up to zero anyway, because Coriolis not part of operator
-  DoRot = 0;
   double *Omega =
       new double[NMode]; // Omega is used as converter from Hartree to cm-1
   uint8_t *Pid = NULL;   // Degrees in each direction
